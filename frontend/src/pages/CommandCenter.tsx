@@ -22,6 +22,7 @@ import { LiveStatusBadge } from "../components/common/LiveStatusBadge";
 import { Button } from "../components/common/Button";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/common/Card";
 import { Skeleton } from "../components/common/Skeleton";
+import { Badge } from "../components/common/Badge";
 import {
   Radio,
   Truck,
@@ -52,7 +53,7 @@ export const CommandCenterPage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Zustand Store Selectors (Stable references)
+  // Zustand Store Selectors
   const telemetryMap = useTelemetryStore((s) => s.vehicles);
   const selectedVehicleId = useTelemetryStore((s) => s.selectedVehicleId);
   const setSelectedVehicleId = useTelemetryStore((s) => s.setSelectedVehicleId);
@@ -224,21 +225,30 @@ export const CommandCenterPage: React.FC = () => {
   const isStreaming = connectionStatus === "CONNECTED";
 
   return (
-    <div className="space-y-6 pb-12 w-full max-w-[1920px] mx-auto">
+    <div className="space-y-6 pb-12 w-full max-w-[1920px] mx-auto select-none">
       {/* ==================================================
           TOP: PAGE TITLE & STATUS STRIP
           ================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-5 mb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/90 pb-5 mb-2">
         <div>
-          <div className="flex items-center gap-2.5">
-            <Radio className="w-6 h-6 text-blue-400 shrink-0 animate-pulse" />
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans">
-              Operations Command Center
-            </h1>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400 shadow-glowBlue">
+              <Radio className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans">
+                  Operations Command Center
+                </h1>
+                <Badge variant="brand" size="md" className="font-mono text-xs">
+                  PALANTIR / ENTERPRISE OPS
+                </Badge>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-400 font-sans mt-0.5">
+                Tactical fleet tracking, real-time telemetry ingestion, AI anomaly modeling, and operational dispatch.
+              </p>
+            </div>
           </div>
-          <p className="text-sm text-slate-400 font-sans mt-1">
-            Real-time fleet health, active telematics stream, and predictive operational intelligence
-          </p>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
@@ -248,7 +258,7 @@ export const CommandCenterPage: React.FC = () => {
             size="md"
           />
 
-          <span className="hidden md:inline-block text-xs font-mono font-semibold px-3 py-2 rounded-xl bg-[#111C2D] border border-slate-700/80 text-cyan-400 tabular-nums shadow-lg">
+          <span className="hidden md:inline-block text-xs font-mono font-bold px-3.5 py-2 rounded-xl bg-[#111C2D] border border-slate-800 text-cyan-400 tabular-nums shadow-lg">
             {utcTime || "00:00:00 UTC"}
           </span>
 
@@ -257,7 +267,7 @@ export const CommandCenterPage: React.FC = () => {
             variant="secondary"
             onClick={() => setScenarioDrawerOpen(true)}
             leftIcon={<Zap className="w-4 h-4 text-amber-400" />}
-            className="bg-[#111C2D] border border-slate-700 hover:bg-[#16253B] text-slate-200"
+            className="bg-[#111C2D] border-slate-700 hover:bg-[#16253B] text-slate-100 font-semibold shadow-card"
           >
             {activeScenarioCount > 0 ? (
               <span className="text-amber-400 font-bold">{activeScenarioCount} Scenarios Active</span>
@@ -290,17 +300,17 @@ export const CommandCenterPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* LEFT: Large Fleet Map (8 cols) */}
         <div className="lg:col-span-8 flex flex-col">
-          <Card className="flex flex-col bg-[#111C2D] border-slate-800">
+          <Card className="flex flex-col bg-[#111C2D] border-slate-800 shadow-2xl rounded-2xl overflow-hidden">
             <CardHeader className="border-b border-slate-800">
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2.5">
                   <span
                     className={clsx(
                       "w-2.5 h-2.5 rounded-full",
-                      isStreaming ? "bg-emerald-400 shadow-glow-emerald" : "bg-amber-400 animate-pulse shadow-glow-amber"
+                      isStreaming ? "bg-emerald-400 shadow-glowEmerald" : "bg-amber-400 animate-pulse"
                     )}
                   />
-                  <CardTitle className="text-slate-100 text-lg">Tactical Fleet Map</CardTitle>
+                  <CardTitle className="text-white text-lg">Tactical Fleet Map Viewport</CardTitle>
                   <span className="text-slate-400 hidden sm:inline font-mono text-xs">
                     · {kpiData.activeVehicles} active streaming units
                   </span>
@@ -308,9 +318,9 @@ export const CommandCenterPage: React.FC = () => {
 
                 <Link
                   to="/map"
-                  className="text-xs sm:text-sm text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5 font-semibold font-sans transition-colors"
+                  className="text-xs sm:text-sm text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5 font-bold font-sans transition-colors"
                 >
-                  <span>Full Screen Map</span>
+                  <span>Full Screen Console</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -334,7 +344,7 @@ export const CommandCenterPage: React.FC = () => {
                 {activeVehicle && liveTelemetry && (
                   <div className="absolute bottom-4 left-4 right-4 z-[400] bg-[#0B0F19]/95 backdrop-blur-md border border-slate-700/90 rounded-2xl p-4 shadow-2xl flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm font-mono">
                     <div className="flex items-center gap-3">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-glow-emerald animate-pulse" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-glowEmerald animate-pulse" />
                       <div>
                         <div className="font-bold text-white text-base">{activeVehicle.name}</div>
                         <div className="text-xs text-slate-400 font-sans font-medium">
@@ -388,9 +398,9 @@ export const CommandCenterPage: React.FC = () => {
                     </div>
 
                     <Link to={`/vehicles?id=${activeVehicle.id}`}>
-                      <Button size="sm" variant="secondary" className="text-xs h-9 px-3.5 font-semibold bg-[#16253B] border-slate-700 text-slate-100 hover:bg-[#1C2F4D]">
-                        <Truck className="w-3.5 h-3.5 text-blue-400 mr-1.5" />
-                        <span>Inspect Asset</span>
+                      <Button size="sm" variant="secondary" className="text-xs h-9 px-3.5 font-semibold bg-[#16253B] border-slate-700 text-slate-100 hover:bg-blue-600 hover:border-blue-500 transition-all">
+                        <Truck className="w-3.5 h-3.5 text-cyan-400 mr-1.5" />
+                        <span>Workstation</span>
                       </Button>
                     </Link>
                   </div>
@@ -475,4 +485,3 @@ export const CommandCenterPage: React.FC = () => {
     </div>
   );
 };
-

@@ -68,11 +68,11 @@ export const DriverCoachingCard: React.FC<DriverCoachingCardProps> = ({
 
   return (
     <Card
-      className={clsx("flex flex-col select-none shadow-card", className)}
+      className={clsx("flex flex-col select-none shadow-card bg-[#111C2D] border border-[#1F2E47]", className)}
       header={
         <div className="flex items-center gap-2">
-          <Lightbulb className="w-4 h-4 text-amber-500" />
-          <span className="font-semibold text-slate-900 font-sans">Actionable Safety Coaching & Insights</span>
+          <Lightbulb className="w-4 h-4 text-amber-400" />
+          <span className="font-semibold text-white font-sans">Actionable Safety Coaching & Insights</span>
         </div>
       }
       headerAction={
@@ -83,11 +83,11 @@ export const DriverCoachingCard: React.FC<DriverCoachingCardProps> = ({
     >
       <div className="space-y-3 font-sans text-xs">
         {recommendations.length === 0 ? (
-          <div className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-[#0B0F19] border border-[#1F2E47]">
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <h4 className="font-semibold text-slate-900">Exemplary Safety Record</h4>
-              <p className="text-slate-600 text-xs">
+              <h4 className="font-semibold text-white">Exemplary Safety Record</h4>
+              <p className="text-slate-400 text-xs leading-relaxed">
                 Driver consistently maintains safe following distances, smooth throttle modulation, and complete highway speed compliance.
               </p>
             </div>
@@ -99,14 +99,14 @@ export const DriverCoachingCard: React.FC<DriverCoachingCardProps> = ({
               className={clsx(
                 "p-3.5 rounded-xl border space-y-1.5",
                 rec.priority === "HIGH"
-                  ? "bg-rose-50/60 border-rose-200"
+                  ? "bg-rose-950/30 border-rose-500/40"
                   : rec.priority === "MEDIUM"
-                  ? "bg-amber-50/60 border-amber-200"
-                  : "bg-slate-50 border-slate-200"
+                  ? "bg-amber-950/30 border-amber-500/40"
+                  : "bg-[#0B0F19] border-[#1F2E47]"
               )}
             >
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-slate-900 text-xs">{rec.title}</span>
+                <span className="font-semibold text-white text-xs">{rec.title}</span>
                 <Badge
                   variant={
                     rec.priority === "HIGH"
@@ -120,7 +120,7 @@ export const DriverCoachingCard: React.FC<DriverCoachingCardProps> = ({
                   {rec.category}
                 </Badge>
               </div>
-              <p className="text-slate-600 leading-relaxed text-xs">{rec.description}</p>
+              <p className="text-slate-300 leading-relaxed text-xs">{rec.description}</p>
             </div>
           ))
         )}

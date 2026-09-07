@@ -65,20 +65,24 @@ export const AlertsPage: React.FC = () => {
     queryFn: () => driversApi.list({ limit: 100 }),
   });
 
-  const rawAlerts = alertsData?.alerts || [];
-  const summary: AlertSummaryCounts = alertsData?.summary || {
-    total: rawAlerts.length,
-    active: rawAlerts.filter((a) => a.status === "ACTIVE").length,
-    acknowledged: rawAlerts.filter((a) => a.status === "ACKNOWLEDGED").length,
-    resolved: rawAlerts.filter((a) => a.status === "RESOLVED").length,
-    critical: rawAlerts.filter((a) => a.severity === "CRITICAL").length,
-    high: rawAlerts.filter((a) => a.severity === "HIGH").length,
-    medium: rawAlerts.filter((a) => a.severity === "MEDIUM").length,
-    low: rawAlerts.filter((a) => a.severity === "LOW" || a.severity === "INFO").length,
-  };
+  const rawAlerts = useMemo(() => alertsData?.alerts || [], [alertsData?.alerts]);
+  const summary: AlertSummaryCounts = useMemo(() => {
+    return (
+      alertsData?.summary || {
+        total: rawAlerts.length,
+        active: rawAlerts.filter((a) => a.status === "ACTIVE").length,
+        acknowledged: rawAlerts.filter((a) => a.status === "ACKNOWLEDGED").length,
+        resolved: rawAlerts.filter((a) => a.status === "RESOLVED").length,
+        critical: rawAlerts.filter((a) => a.severity === "CRITICAL").length,
+        high: rawAlerts.filter((a) => a.severity === "HIGH").length,
+        medium: rawAlerts.filter((a) => a.severity === "MEDIUM").length,
+        low: rawAlerts.filter((a) => a.severity === "LOW" || a.severity === "INFO").length,
+      }
+    );
+  }, [alertsData?.summary, rawAlerts]);
 
-  const vehicles = vehiclesData?.vehicles || [];
-  const drivers = driversData || [];
+  const vehicles = useMemo(() => vehiclesData?.vehicles || [], [vehiclesData?.vehicles]);
+  const drivers = useMemo(() => driversData || [], [driversData]);
 
   // Lookup maps
   const vehicleMap = useMemo(() => {
@@ -186,16 +190,16 @@ export const AlertsPage: React.FC = () => {
   if (isLoadingAlerts && rawAlerts.length === 0) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-10 w-72" />
+        <Skeleton className="h-12 w-80 rounded-xl" />
         <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
-          <Skeleton className="h-20 w-full rounded-xl" />
-          <Skeleton className="h-20 w-full rounded-xl" />
-          <Skeleton className="h-20 w-full rounded-xl" />
-          <Skeleton className="h-20 w-full rounded-xl" />
-          <Skeleton className="h-20 w-full rounded-xl" />
-          <Skeleton className="h-20 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
         </div>
-        <Skeleton className="h-96 w-full rounded-xl" />
+        <Skeleton className="h-96 w-full rounded-2xl" />
       </div>
     );
   }
@@ -214,41 +218,58 @@ export const AlertsPage: React.FC = () => {
     acknowledgeMutation.isPending || resolveMutation.isPending || deleteMutation.isPending;
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto space-y-6 pb-12">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1F2E47] pb-4">
+    <div className="w-full max-w-[1920px] mx-auto space-y-6 pb-12 select-none">
+      {/* ==================================================
+          TOP COMMAND HEADER
+          ================================================== */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/90 pb-5">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5 font-sans">
-            <ShieldAlert className="w-6 h-6 text-rose-500" />
-            <span>Alert Center & Incident Triage</span>
-            <Badge variant="critical" size="sm" dot>
-              {summary.active} ACTIVE
-            </Badge>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-sans">
-            Deduplicated anomaly detection, severity prioritization, telemetry investigation, and operator dispatch triage.
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-rose-600/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shadow-glowCritical">
+              <ShieldAlert className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans">
+                  Alert Center & Incident Triage Command
+                </h1>
+                <Badge variant="critical" size="md" dot className="font-mono text-xs">
+                  {summary.active} ACTIVE INCIDENTS
+                </Badge>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-sans">
+                Real-time anomaly deduplication, multi-sensor threshold violations, operator escalation, and dispatch triage.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <Button
             size="md"
             variant="secondary"
             onClick={() => setScenarioDrawerOpen(true)}
-            leftIcon={<Zap className="w-4 h-4 text-amber-500" />}
+            leftIcon={<Zap className="w-4 h-4 text-amber-400" />}
+            className="bg-[#111C2D] border-slate-700 hover:bg-[#16253B] text-white shadow-card font-semibold"
           >
             Scenario Cockpit
           </Button>
         </div>
       </div>
 
-      {/* Real-time Fleet Incident KPI Strip */}
+      {/* ==================================================
+          REAL-TIME FLEET INCIDENT KPI STRIP
+          ================================================== */}
       <AlertKpiStrip summary={summary} />
 
-      {/* Incident Category Distribution & Volume Chart */}
+      {/* ==================================================
+          INCIDENT CATEGORY DISTRIBUTION & VOLUME TREND CHART
+          ================================================== */}
       <AlertVolumeTrendChart alerts={rawAlerts} height={240} />
 
-      {/* 3-Column Triage Workstation Grid */}
+      {/* ==================================================
+          3-COLUMN TRIAGE WORKSTATION GRID
+          ================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Triage Filters (3 cols) */}
         <div className="lg:col-span-3 flex flex-col">

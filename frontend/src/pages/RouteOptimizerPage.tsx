@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { routesApi } from "../api/routes";
 import { vehiclesApi } from "../api/vehicles";
@@ -124,8 +124,8 @@ export const RouteOptimizerPage: React.FC = () => {
     queryFn: () => driversApi.list({ limit: 100 }),
   });
 
-  const vehicles = vehiclesData?.vehicles || [];
-  const drivers = driversData || [];
+  const vehicles = useMemo(() => vehiclesData?.vehicles || [], [vehiclesData?.vehicles]);
+  const drivers = useMemo(() => driversData || [], [driversData]);
 
   // Find assigned vehicle and driver
   const assignedVehicle = vehicles.find((v) => v.id === selectedVehicleId) || null;
@@ -228,7 +228,6 @@ export const RouteOptimizerPage: React.FC = () => {
       latitude: saved.dest_lat,
       longitude: saved.dest_lon,
     });
-    // Extract stops from waypoints
     const extractedStops: Waypoint[] = (saved.waypoints || []).map((w, idx) => ({
       name: (w.name as string) || `Stop #${idx + 1}`,
       latitude: Number(w.latitude) || 0,
@@ -239,20 +238,30 @@ export const RouteOptimizerPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto space-y-6 pb-12">
-      {/* Workstation Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1F2E47] pb-4">
+    <div className="w-full max-w-[1920px] mx-auto space-y-6 pb-12 select-none">
+      {/* ==================================================
+          TOP COMMAND HEADER
+          ================================================== */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/90 pb-5">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5 font-sans">
-            <RouteIcon className="w-6 h-6 text-cyan-400" />
-            <span>Mission Dispatch & Route Optimizer</span>
-            <Badge variant="brand" size="sm">
-              2-OPT TSP
-            </Badge>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-sans">
-            Algorithmic traveling salesperson optimization, comparative savings analysis, and dispatch routing.
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-cyan-600/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-glowCyan">
+              <RouteIcon className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans">
+                  Mission Dispatch & Route Optimizer
+                </h1>
+                <Badge variant="brand" size="md" className="font-mono text-xs">
+                  2-OPT TSP ENGINE
+                </Badge>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-sans">
+                Traveling salesperson optimization, comparative carbon/distance savings analysis, and dispatch routing.
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
@@ -261,6 +270,7 @@ export const RouteOptimizerPage: React.FC = () => {
             variant="secondary"
             onClick={() => setSavedRoutesDrawerOpen(true)}
             leftIcon={<Bookmark className="w-4 h-4 text-cyan-400" />}
+            className="bg-[#111C2D] border-slate-700 hover:bg-[#16253B] text-white shadow-card font-semibold"
           >
             Saved Missions
           </Button>
@@ -270,6 +280,7 @@ export const RouteOptimizerPage: React.FC = () => {
             variant="secondary"
             onClick={() => setScenarioDrawerOpen(true)}
             leftIcon={<Zap className="w-4 h-4 text-amber-400" />}
+            className="bg-[#111C2D] border-slate-700 hover:bg-[#16253B] text-white shadow-card font-semibold"
           >
             Scenario Cockpit
           </Button>
@@ -278,13 +289,15 @@ export const RouteOptimizerPage: React.FC = () => {
 
       {/* Validation Error Banner */}
       {validationError && (
-        <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/40 flex items-center gap-2.5 text-xs sm:text-sm font-sans text-rose-300 shadow-glow-crimson">
-          <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+        <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-500/50 flex items-center gap-3 text-xs sm:text-sm font-sans text-rose-300 shadow-glowCritical animate-in fade-in">
+          <AlertCircle className="w-5 h-5 shrink-0 text-rose-400" />
           <span>{validationError}</span>
         </div>
       )}
 
-      {/* 3-Column Responsive Workstation Grid */}
+      {/* ==================================================
+          3-COLUMN RESPONSIVE WORKSTATION GRID
+          ================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Mission Setup (4 cols) */}
         <div className="lg:col-span-4 flex flex-col">
@@ -322,7 +335,7 @@ export const RouteOptimizerPage: React.FC = () => {
             stops={stops}
             optimizationResult={optimizationResult}
             showOriginalPath={true}
-            className="h-[520px] lg:h-[620px]"
+            className="h-[540px] lg:h-[640px] rounded-2xl shadow-2xl border border-slate-800"
           />
         </div>
 
@@ -352,4 +365,3 @@ export const RouteOptimizerPage: React.FC = () => {
     </div>
   );
 };
-

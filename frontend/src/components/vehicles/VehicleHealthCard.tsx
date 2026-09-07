@@ -15,9 +15,9 @@ import {
   Droplets,
   Zap,
   Gauge,
-  Disc,
   Fuel,
   Cpu,
+  Sparkles,
 } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -40,6 +40,7 @@ interface SubsystemHealth {
   status: "OPTIMAL" | "NOMINAL" | "ELEVATED" | "WARNING" | "CRITICAL";
   statusColor: string;
   progressColor: string;
+  bgGlow: string;
 }
 
 export const VehicleHealthCard: React.FC<VehicleHealthCardProps> = ({
@@ -52,16 +53,16 @@ export const VehicleHealthCard: React.FC<VehicleHealthCardProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <Card className={className} header="Powertrain Health Assessment">
-        <div className="space-y-4 p-4">
-          <Skeleton className="h-24 w-full rounded-xl" />
+      <Card className={className} header="Powertrain Health Diagnostic Workstation">
+        <div className="space-y-4 p-5">
+          <Skeleton className="h-32 w-full rounded-2xl" />
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <Skeleton className="h-20 w-full rounded-xl" />
-            <Skeleton className="h-20 w-full rounded-xl" />
-            <Skeleton className="h-20 w-full rounded-xl" />
-            <Skeleton className="h-20 w-full rounded-xl" />
-            <Skeleton className="h-20 w-full rounded-xl" />
-            <Skeleton className="h-20 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
           </div>
         </div>
       </Card>
@@ -69,10 +70,18 @@ export const VehicleHealthCard: React.FC<VehicleHealthCardProps> = ({
   }
 
   // 1. Core Health Values
-  const score = health?.health_score ?? (vehicle?.health_status === "CRITICAL" ? 42 : vehicle?.health_status === "WARNING" ? 68 : 96.5);
+  const score =
+    health?.health_score ??
+    (vehicle?.health_status === "CRITICAL"
+      ? 42.0
+      : vehicle?.health_status === "WARNING"
+      ? 68.0
+      : 96.5);
   const status = health?.status ?? vehicle?.health_status ?? "GOOD";
   const riskFactors = health?.risk_factors || [];
-  const summary = health?.summary || "Powertrain operating within nominal factory thresholds with healthy sensor margins.";
+  const summary =
+    health?.summary ||
+    "Powertrain operating within nominal factory thresholds with robust thermal and sensor margins.";
 
   const isCritical = status === "CRITICAL" || score < 50;
   const isWarning = status === "WARNING" || (score >= 50 && score < 80);
@@ -93,6 +102,7 @@ export const VehicleHealthCard: React.FC<VehicleHealthCardProps> = ({
       battery_voltage: 13.6,
       tire_pressure_psi: 34.0,
       fuel_level_pct: 78.0,
+      speed: 68.5,
     };
 
     // A. Engine / RPM
@@ -155,19 +165,19 @@ export const VehicleHealthCard: React.FC<VehicleHealthCardProps> = ({
       voltStatus = "NOMINAL";
     }
 
-    // E. Tire Pressure / Chassis
-    const tire = t.tire_pressure_psi ?? 34;
-    let tireHealth = 100;
-    let tireStatus: SubsystemHealth["status"] = "OPTIMAL";
-    if (tire < 26 || tire > 44) {
-      tireHealth = 35;
-      tireStatus = "CRITICAL";
-    } else if (tire < 30 || tire > 38) {
-      tireHealth = 70;
-      tireStatus = "WARNING";
-    } else if (tire < 32) {
-      tireHealth = 90;
-      tireStatus = "NOMINAL";
+    // E. Kinematics & Velocity
+    const speed = t.speed ?? 65.0;
+    let speedHealth = 100;
+    let speedStatus: SubsystemHealth["status"] = "OPTIMAL";
+    if (speed > 115) {
+      speedHealth = 50;
+      speedStatus = "WARNING";
+    } else if (speed > 95) {
+      speedHealth = 80;
+      speedStatus = "ELEVATED";
+    } else {
+      speedHealth = 98;
+      speedStatus = "NOMINAL";
     }
 
     // F. Fuel Delivery System
@@ -188,45 +198,35 @@ export const VehicleHealthCard: React.FC<VehicleHealthCardProps> = ({
     const getStatusStyle = (st: SubsystemHealth["status"]) => {
       switch (st) {
         case "CRITICAL":
-          return { text: "text-rose-400", bar: "bg-rose-500" };
+          return { text: "text-rose-400", bar: "bg-rose-500", bg: "bg-rose-950/30 border-rose-500/30" };
         case "WARNING":
-          return { text: "text-amber-400", bar: "bg-amber-400" };
+          return { text: "text-amber-400", bar: "bg-amber-400", bg: "bg-amber-950/30 border-amber-500/30" };
         case "ELEVATED":
-          return { text: "text-blue-400", bar: "bg-blue-400" };
+          return { text: "text-blue-400", bar: "bg-blue-400", bg: "bg-blue-950/30 border-blue-500/30" };
         case "NOMINAL":
-          return { text: "text-cyan-300", bar: "bg-cyan-500" };
+          return { text: "text-cyan-300", bar: "bg-cyan-500", bg: "bg-cyan-950/30 border-cyan-500/30" };
         case "OPTIMAL":
         default:
-          return { text: "text-emerald-400", bar: "bg-emerald-400" };
+          return { text: "text-emerald-400", bar: "bg-emerald-400", bg: "bg-emerald-950/30 border-emerald-500/30" };
       }
     };
 
     return [
       {
-        name: "Combustion & RPM",
-        category: "Engine Core",
-        icon: Gauge,
-        value: `${Math.round(rpm).toLocaleString()} RPM`,
-        benchmark: "Nominal: < 3,500 RPM",
-        healthScore: rpmHealth,
-        status: rpmStatus,
-        statusColor: getStatusStyle(rpmStatus).text,
-        progressColor: getStatusStyle(rpmStatus).bar,
-      },
-      {
-        name: "Thermal & Cooling",
+        name: "Engine Thermal Dynamics",
         category: "Coolant Loop",
         icon: Thermometer,
         value: `${temp.toFixed(1)} °C`,
-        benchmark: "Threshold: 105 °C",
+        benchmark: "Threshold: 105.0 °C",
         healthScore: tempHealth,
         status: tempStatus,
         statusColor: getStatusStyle(tempStatus).text,
         progressColor: getStatusStyle(tempStatus).bar,
+        bgGlow: getStatusStyle(tempStatus).bg,
       },
       {
-        name: "Oil Lubrication",
-        category: "Hydraulic System",
+        name: "Hydraulic Lubrication",
+        category: "Oil Pressure",
         icon: Droplets,
         value: `${oil.toFixed(1)} PSI`,
         benchmark: "Nominal: 35-55 PSI",
@@ -234,6 +234,43 @@ export const VehicleHealthCard: React.FC<VehicleHealthCardProps> = ({
         status: oilStatus,
         statusColor: getStatusStyle(oilStatus).text,
         progressColor: getStatusStyle(oilStatus).bar,
+        bgGlow: getStatusStyle(oilStatus).bg,
+      },
+      {
+        name: "Combustion & Load",
+        category: "Engine RPM",
+        icon: Gauge,
+        value: `${Math.round(rpm).toLocaleString()} RPM`,
+        benchmark: "Nominal: < 3,500 RPM",
+        healthScore: rpmHealth,
+        status: rpmStatus,
+        statusColor: getStatusStyle(rpmStatus).text,
+        progressColor: getStatusStyle(rpmStatus).bar,
+        bgGlow: getStatusStyle(rpmStatus).bg,
+      },
+      {
+        name: "Kinematic Propulsion",
+        category: "Speed Telematics",
+        icon: Activity,
+        value: `${speed.toFixed(1)} km/h`,
+        benchmark: "Nominal: 60-100 km/h",
+        healthScore: speedHealth,
+        status: speedStatus,
+        statusColor: getStatusStyle(speedStatus).text,
+        progressColor: getStatusStyle(speedStatus).bar,
+        bgGlow: getStatusStyle(speedStatus).bg,
+      },
+      {
+        name: "Energy Storage & Fuel",
+        category: "Fuel Reserve",
+        icon: Fuel,
+        value: `${Math.round(fuel)}%`,
+        benchmark: "Reserve Limit: > 20%",
+        healthScore: fuelHealth,
+        status: fuelStatus,
+        statusColor: getStatusStyle(fuelStatus).text,
+        progressColor: getStatusStyle(fuelStatus).bar,
+        bgGlow: getStatusStyle(fuelStatus).bg,
       },
       {
         name: "Electrical Circuit",
@@ -245,179 +282,209 @@ export const VehicleHealthCard: React.FC<VehicleHealthCardProps> = ({
         status: voltStatus,
         statusColor: getStatusStyle(voltStatus).text,
         progressColor: getStatusStyle(voltStatus).bar,
-      },
-      {
-        name: "Chassis & Tires",
-        category: "Tire Pressure",
-        icon: Disc,
-        value: `${tire.toFixed(1)} PSI`,
-        benchmark: "Standard: 32-36 PSI",
-        healthScore: tireHealth,
-        status: tireStatus,
-        statusColor: getStatusStyle(tireStatus).text,
-        progressColor: getStatusStyle(tireStatus).bar,
-      },
-      {
-        name: "Fuel Injection",
-        category: "Fuel Reserve",
-        icon: Fuel,
-        value: `${Math.round(fuel)}%`,
-        benchmark: "Reserve: > 20%",
-        healthScore: fuelHealth,
-        status: fuelStatus,
-        statusColor: getStatusStyle(fuelStatus).text,
-        progressColor: getStatusStyle(fuelStatus).bar,
+        bgGlow: getStatusStyle(voltStatus).bg,
       },
     ];
   }, [telemetry]);
 
-  // Radial progress circumference calculation (radius = 38)
-  const radius = 38;
+  // Large Radial progress circumference calculation (radius = 54)
+  const radius = 54;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (Math.min(100, Math.max(0, score)) / 100) * circumference;
+  const strokeDashoffset =
+    circumference - (Math.min(100, Math.max(0, score)) / 100) * circumference;
 
   return (
     <Card
       variant={isCritical ? "criticalGlow" : "default"}
-      className={clsx("flex flex-col justify-between select-none shadow-card bg-[#111C2D] border border-[#1F2E47]", className)}
+      className={clsx(
+        "flex flex-col justify-between select-none shadow-2xl bg-[#111C2D] border border-slate-800 rounded-2xl overflow-hidden",
+        className
+      )}
       header={
-        <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-cyan-400" />
-          <span className="font-semibold text-white font-sans text-sm sm:text-base">Powertrain Health Assessment</span>
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 rounded-lg bg-blue-600/20 border border-blue-500/40 text-blue-400 shadow-glowBlue">
+            <Cpu className="w-5 h-5" />
+          </div>
+          <div>
+            <span className="font-bold text-base text-white font-sans block">
+              Powertrain Health Assessment Workstation
+            </span>
+            <span className="text-[11px] text-slate-400 font-mono">
+              Composite Subsystem Telemetry Assessment
+            </span>
+          </div>
         </div>
       }
       headerAction={
         <div className="flex items-center gap-2">
-          <Badge variant="brand" size="sm">
-            LIVE TELEMETRY
+          <Badge variant="brand" size="sm" className="font-mono text-[10px]">
+            REAL-TIME TELEMATICS
           </Badge>
           <StatusBadge status={status} size="sm" />
         </div>
       }
     >
-      <div className="space-y-4 p-4 font-sans text-xs">
-        {/* 1. Tactical Radial Health Index & Overall Condition Banner */}
-        <div className="p-4 rounded-xl bg-[#0B0F19] border border-[#1F2E47] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-          {/* Left: Score & Radial Gauge */}
-          <div className="flex items-center gap-4">
-            <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 96 96">
-                {/* Background Ring */}
+      <div className="space-y-6 p-5 font-sans text-xs">
+        {/* ==================================================
+            HERO: LARGE POWERTRAIN RADIAL WORKSTATION
+            ================================================== */}
+        <div className="p-5 rounded-2xl bg-[#0B0F19] border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden">
+          {/* Radial Glow Ambient Effect */}
+          <div
+            className="absolute -left-10 -top-10 w-48 h-48 rounded-full blur-3xl pointer-events-none opacity-20"
+            style={{
+              backgroundColor: isCritical ? "#EF4444" : isWarning ? "#F59E0B" : "#10B981",
+            }}
+          />
+
+          {/* Left: Large SVG Radial Health Gauge */}
+          <div className="flex items-center gap-6">
+            <div className="relative w-36 h-36 shrink-0 flex items-center justify-center">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 130 130">
+                {/* Background Track Ring */}
                 <circle
-                  cx="48"
-                  cy="48"
+                  cx="65"
+                  cy="65"
                   r={radius}
                   stroke="#16253B"
-                  strokeWidth="8"
+                  strokeWidth="10"
                   fill="transparent"
                 />
-                {/* Progress Arc */}
+                {/* Secondary Ticks Ring */}
                 <circle
-                  cx="48"
-                  cy="48"
+                  cx="65"
+                  cy="65"
+                  r={radius}
+                  stroke="#1F2E47"
+                  strokeWidth="10"
+                  strokeDasharray="4 8"
+                  fill="transparent"
+                />
+                {/* Progress Glowing Arc */}
+                <circle
+                  cx="65"
+                  cy="65"
                   r={radius}
                   stroke={isCritical ? "#EF4444" : isWarning ? "#F59E0B" : "#10B981"}
-                  strokeWidth="8"
+                  strokeWidth="10"
                   strokeDasharray={circumference}
                   strokeDashoffset={strokeDashoffset}
                   strokeLinecap="round"
                   fill="transparent"
-                  className="transition-all duration-700 ease-out"
+                  className="transition-all duration-1000 ease-out"
                 />
               </svg>
-              {/* Inner Center Value */}
+
+              {/* Inner Center Health Readout */}
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className={clsx("text-xl font-extrabold font-mono tracking-tight leading-none", statusColor)}>
+                <span className={clsx("text-3xl font-extrabold font-mono tracking-tight leading-none", statusColor)}>
                   {score.toFixed(0)}%
                 </span>
-                <span className="text-[9px] text-slate-400 font-mono mt-0.5 uppercase font-bold">HEALTH</span>
+                <span className="text-[10px] text-slate-400 font-mono mt-1 uppercase font-bold tracking-widest">
+                  HEALTH
+                </span>
               </div>
             </div>
 
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
-                  System Health Score
-                </span>
-              </div>
-              <div className="flex items-baseline gap-2 mt-0.5">
-                <span className={clsx("text-2xl font-bold font-mono tracking-tight", statusColor)}>
+            {/* Score & Operational Envelope Assessment */}
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono block">
+                Powertrain Health Index
+              </span>
+              <div className="flex items-baseline gap-2">
+                <span className={clsx("text-3xl sm:text-4xl font-extrabold font-mono tracking-tight", statusColor)}>
                   {score.toFixed(1)}
                 </span>
-                <span className="text-xs font-mono text-slate-500">/ 100.0</span>
+                <span className="text-sm font-mono text-slate-500 font-bold">/ 100.0</span>
               </div>
-              <div className="flex items-center gap-1.5 mt-1">
+              <div className="flex items-center gap-2 pt-1">
                 {isCritical ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-mono text-[10px] font-bold border border-rose-500/30">
-                    <ShieldAlert className="w-3 h-3" /> DEGRADED CONDITION
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-950/60 text-rose-300 font-mono text-xs font-bold border border-rose-500/50 shadow-glowCritical animate-pulse">
+                    <ShieldAlert className="w-3.5 h-3.5" /> CRITICAL FAILURE RISK
                   </span>
                 ) : isWarning ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold border border-amber-500/30">
-                    <AlertTriangle className="w-3 h-3" /> ELEVATED WEAR
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-950/60 text-amber-300 font-mono text-xs font-bold border border-amber-500/50 shadow-glowAmber">
+                    <AlertTriangle className="w-3.5 h-3.5" /> DEGRADED SUBSYSTEM
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-bold border border-emerald-500/30">
-                    <CheckCircle2 className="w-3 h-3" /> NOMINAL OPERATING
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-950/60 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/50 shadow-glowEmerald">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> NOMINAL OPERATING ENVELOPE
                   </span>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Right: Telemetry Stream Health Indicator */}
-          <div className="text-right sm:border-l sm:border-[#1F2E47] sm:pl-4 space-y-1 w-full sm:w-auto">
+          {/* Right: Telemetry Stream Synchronization Status */}
+          <div className="md:border-l md:border-slate-800 md:pl-6 space-y-2 w-full md:w-auto text-left md:text-right">
             <span className="text-[10px] text-slate-400 uppercase font-mono font-bold block">
-              Subsystem Sensors
+              Subsystem Telematics
             </span>
-            <div className="text-sm font-bold text-white font-mono flex items-center justify-end gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-glowEmerald" />
-              <span>6/6 STREAMING</span>
+            <div className="text-base font-bold text-white font-mono flex items-center md:justify-end gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-glowEmerald" />
+              <span className="text-emerald-400">6 / 6 NODES STREAMING</span>
             </div>
-            <span className="text-[10px] text-slate-400 font-sans block">
-              {history.length > 0 ? `${history.length} telemetry samples synchronized` : "Real-time calibration active"}
-            </span>
+            <p className="text-xs text-slate-400 font-sans">
+              {history.length > 0
+                ? `${history.length} ring-buffered telemetry packets synced`
+                : "Real-time telemetry calibrated"}
+            </p>
           </div>
         </div>
 
-        {/* 2. Subsystem Component Health Matrix (6 Cards) */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono flex items-center gap-1">
-              <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Subsystem Component Diagnostics</span>
+        {/* ==================================================
+            SIX SUBSYSTEM DIAGNOSTIC CARDS MATRIX
+            ================================================== */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 font-mono flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-cyan-400" />
+              <span>Six-Subsystem Diagnostic Matrix</span>
             </span>
-            <span className="text-[10px] font-mono text-slate-500">Live Reading · Target</span>
+            <span className="text-[11px] font-mono text-slate-500">
+              Live Readout · Factory Bounds
+            </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
             {subsystems.map((sub, idx) => {
               const Icon = sub.icon;
               return (
                 <div
                   key={idx}
-                  className="p-3 rounded-xl bg-[#0B0F19] border border-[#1F2E47] hover:border-[#2A3F5F] transition-colors space-y-2 shadow-sm"
+                  className={clsx(
+                    "p-3.5 rounded-xl bg-[#0B0F19] border transition-all space-y-2.5 shadow-md",
+                    sub.bgGlow
+                  )}
                 >
-                  <div className="flex items-start justify-between gap-1">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <div className="p-1 rounded-md bg-[#16253B] border border-[#1F2E47] text-cyan-400 shrink-0">
-                        <Icon className="w-3.5 h-3.5" />
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="p-1.5 rounded-lg bg-[#16253B] border border-slate-700 text-cyan-400 shrink-0">
+                        <Icon className="w-4 h-4" />
                       </div>
-                      <span className="font-semibold text-white text-xs truncate font-sans">{sub.name}</span>
+                      <span className="font-bold text-white text-xs truncate font-sans">
+                        {sub.name}
+                      </span>
                     </div>
-                    <span className={clsx("font-bold text-[10px] font-mono shrink-0", sub.statusColor)}>
+                    <span
+                      className={clsx(
+                        "font-bold text-[10px] font-mono px-2 py-0.5 rounded-md uppercase shrink-0",
+                        sub.statusColor
+                      )}
+                    >
                       {sub.status}
                     </span>
                   </div>
 
                   <div>
                     <div className="flex items-baseline justify-between font-mono">
-                      <span className="text-sm font-bold text-slate-100">{sub.value}</span>
-                      <span className="text-[10px] font-bold text-cyan-400">{sub.healthScore}%</span>
+                      <span className="text-base font-bold text-slate-100">{sub.value}</span>
+                      <span className="text-xs font-bold text-cyan-400">{sub.healthScore}%</span>
                     </div>
-                    <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1 border border-slate-700/40">
+                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5 border border-slate-700/60">
                       <div
-                        className={clsx("h-full rounded-full transition-all duration-500", sub.progressColor)}
-                        style={{ width: `${Math.min(100, Math.max(5, sub.healthScore))}%` }}
+                        className={clsx("h-full rounded-full transition-all duration-700", sub.progressColor)}
+                        style={{ width: `${Math.min(100, Math.max(8, sub.healthScore))}%` }}
                       />
                     </div>
                   </div>
@@ -429,27 +496,31 @@ export const VehicleHealthCard: React.FC<VehicleHealthCardProps> = ({
           </div>
         </div>
 
-        {/* 3. Diagnostic Narrative Explanation */}
-        <div className="text-xs text-slate-300 bg-[#0B0F19] p-3.5 rounded-xl border border-[#1F2E47] leading-relaxed font-sans space-y-1 shadow-sm">
-          <div className="flex items-center gap-1.5 text-slate-200 font-bold text-[11px] font-mono uppercase">
-            <Activity className="w-3.5 h-3.5 text-cyan-400" />
-            <span>AI Diagnostic Narrative</span>
+        {/* ==================================================
+            AI DIAGNOSTIC NARRATIVE & CAUSALITY
+            ================================================== */}
+        <div className="text-xs text-slate-300 bg-[#0B0F19] p-4 rounded-xl border border-slate-800 leading-relaxed font-sans space-y-1.5 shadow-sm">
+          <div className="flex items-center gap-2 text-slate-200 font-bold text-xs font-mono uppercase">
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <span>AI Powertrain Diagnostic Narrative</span>
           </div>
           <p className="text-slate-300 text-xs leading-relaxed">{summary}</p>
         </div>
 
-        {/* 4. Identified Risk Factors */}
+        {/* ==================================================
+            IDENTIFIED RISK FACTORS & ANOMALIES
+            ================================================== */}
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 block font-mono">
-            Active Risk Factors & Anomalies ({riskFactors.length})
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 block font-mono">
+            Active Anomaly Risk Factors ({riskFactors.length})
           </span>
           {riskFactors.length === 0 ? (
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-xs text-emerald-300 font-sans shadow-sm">
-              <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
-              <span>Zero abnormal powertrain risk factors detected. Component telemetry is nominal.</span>
+            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-xs text-emerald-300 font-sans shadow-sm">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+              <span>Zero abnormal powertrain risk factors detected. Component telemetry is operating within nominal specifications.</span>
             </div>
           ) : (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {riskFactors.map((factor, idx) => (
                 <Badge key={idx} variant={isCritical ? "critical" : "warning"} size="sm" dot>
                   {factor}

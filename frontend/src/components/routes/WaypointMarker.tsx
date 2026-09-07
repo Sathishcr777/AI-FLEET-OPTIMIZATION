@@ -114,31 +114,31 @@ export const WaypointMarker: React.FC<WaypointMarkerProps> = ({
     <Marker position={[waypoint.latitude, waypoint.longitude]} icon={icon}>
       <Tooltip direction="top" offset={[0, -28]} opacity={0.95}>
         <div className="font-sans text-xs p-1">
-          <div className="font-semibold text-slate-900">{waypoint.name}</div>
-          <div className="text-slate-500 text-[11px] font-mono">
+          <div className="font-semibold text-white">{waypoint.name}</div>
+          <div className="text-slate-400 text-[11px] font-mono">
             Lat: {waypoint.latitude.toFixed(4)}, Lon: {waypoint.longitude.toFixed(4)}
           </div>
           {sequenceIndex !== undefined && (
-            <div className="text-blue-600 text-[11px] font-semibold mt-0.5 font-sans">
+            <div className="text-cyan-400 text-[11px] font-semibold mt-0.5 font-sans">
               Stop #{sequenceIndex + 1}
               {originalIndex !== undefined && originalIndex !== sequenceIndex && (
-                <span className="text-amber-600 ml-1 font-normal">(Original: #{originalIndex + 1})</span>
+                <span className="text-amber-400 ml-1 font-normal">(Original: #{originalIndex + 1})</span>
               )}
             </div>
           )}
         </div>
       </Tooltip>
-      <Popup className="light-popup">
-        <div className="p-2 font-sans text-xs space-y-1 text-slate-700">
-          <div className="font-bold text-slate-900 text-sm">{waypoint.name}</div>
-          <div className="text-xs text-slate-500">
+      <Popup>
+        <div className="p-3 font-sans text-xs space-y-1.5 bg-[#111C2D] text-slate-200">
+          <div className="font-bold text-white text-sm">{waypoint.name}</div>
+          <div className="text-xs text-slate-400">
             {type === "origin"
               ? "Mission Origin Depot"
               : type === "destination"
               ? "Final Mission Destination"
               : `Delivery Stop #${(sequenceIndex ?? 0) + 1}`}
           </div>
-          <div className="text-[11px] text-slate-400 pt-1 border-t border-slate-200 font-mono">
+          <div className="text-[11px] text-cyan-400 pt-1 border-t border-[#1F2E47] font-mono">
             GPS: {waypoint.latitude.toFixed(6)}, {waypoint.longitude.toFixed(6)}
           </div>
         </div>

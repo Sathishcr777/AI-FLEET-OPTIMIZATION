@@ -30,6 +30,7 @@ interface HealthRankItem {
   score: number;
   status: string;
   color: string;
+  glowColor: string;
 }
 
 interface FuelItem {
@@ -49,8 +50,6 @@ interface SensorItem {
   color: string;
 }
 
-import { CHART_COLORS } from "../charts/chartTheme";
-
 export const VehicleFleetVisualOverview: React.FC<VehicleFleetVisualOverviewProps> = ({
   vehicles,
   telemetryMap,
@@ -63,14 +62,15 @@ export const VehicleFleetVisualOverview: React.FC<VehicleFleetVisualOverviewProp
   const healthRankingData: HealthRankItem[] = useMemo(() => {
     return [...vehicles]
       .map((v) => {
-        const score = v.health_status === "CRITICAL" ? 40 : v.health_status === "WARNING" ? 70 : 95;
+        const score = v.health_status === "CRITICAL" ? 42 : v.health_status === "WARNING" ? 68 : 96.5;
         return {
           id: v.id,
           name: v.name,
           plate: v.license_plate,
           score,
           status: v.health_status || "GOOD",
-          color: score >= 85 ? "#10B981" : score >= 65 ? "#F59E0B" : "#EF4444",
+          color: score >= 85 ? "#10B981" : score >= 60 ? "#F59E0B" : "#EF4444",
+          glowColor: score >= 85 ? "rgba(16, 185, 129, 0.4)" : score >= 60 ? "rgba(245, 158, 11, 0.4)" : "rgba(239, 68, 68, 0.5)",
         };
       })
       .sort((a, b) => b.score - a.score);
@@ -109,42 +109,74 @@ export const VehicleFleetVisualOverview: React.FC<VehicleFleetVisualOverviewProp
   const activeMeta = METRIC_METAS[selectedSensorMetric] || METRIC_METAS.speed;
 
   return (
-    <div className={clsx("grid grid-cols-1 lg:grid-cols-12 gap-4 select-none", className)}>
-      {/* Chart 9: Vehicle Health Ranking (4 cols) */}
+    <div className={clsx("grid grid-cols-1 lg:grid-cols-12 gap-5 select-none", className)}>
+      {/* Module 1: Powertrain Health Matrix & Leaderboard (4 cols) */}
       <Card
-        className="lg:col-span-4 flex flex-col shadow-card"
+        className="lg:col-span-4 flex flex-col shadow-2xl bg-[#111C2D] border border-slate-800 hover:border-slate-700 transition-all rounded-2xl overflow-hidden"
         header={
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span className="font-semibold text-xs text-slate-100 font-sans">
-              Vehicle Health Ranking
-            </span>
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-400">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="font-bold text-sm sm:text-base text-white font-sans block">
+                Powertrain Health Leaderboard
+              </span>
+              <span className="text-[10px] text-slate-400 font-mono">
+                Asset Condition Index (0 - 100)
+              </span>
+            </div>
           </div>
         }
         headerAction={
-          <Badge variant="brand" size="sm">
-            HIGH → LOW
+          <Badge variant="brand" size="sm" className="font-mono text-[10px]">
+            AI RANKED
           </Badge>
         }
       >
-        <div className="h-44 w-full relative">
+        <div className="h-52 w-full relative pt-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={healthRankingData}
               layout="vertical"
-              margin={{ top: 5, right: 10, left: 30, bottom: 0 }}
+              margin={{ top: 0, right: 20, left: 15, bottom: 0 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} vertical={false} />
-              <XAxis type="number" domain={[0, 100]} stroke={CHART_COLORS.axisBorder} tick={{ fill: CHART_COLORS.axisText, fontSize: 10, fontFamily: "monospace" }} tickLine={false} />
-              <YAxis type="category" dataKey="plate" stroke={CHART_COLORS.axisBorder} tick={{ fill: CHART_COLORS.axisText, fontSize: 10, fontFamily: "monospace" }} tickLine={false} width={70} />
+              <CartesianGrid strokeDasharray="2 2" stroke="#1E293B" vertical={false} />
+              <XAxis
+                type="number"
+                domain={[0, 100]}
+                stroke="#64748B"
+                tick={{ fill: "#94A3B8", fontSize: 10, fontFamily: "monospace" }}
+                tickLine={false}
+              />
+              <YAxis
+                type="category"
+                dataKey="plate"
+                stroke="#64748B"
+                tick={{ fill: "#F8FAFC", fontSize: 11, fontFamily: "monospace", fontWeight: 600 }}
+                tickLine={false}
+                width={80}
+              />
               <Tooltip
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const item = payload[0].payload as HealthRankItem;
                     return (
-                      <div className="p-2.5 bg-[#111C2D]/95 text-white border border-[#1F2E47] shadow-xl rounded-xl text-xs font-mono">
-                        <p className="font-bold text-white font-sans">{item.name}</p>
-                        <p className="text-emerald-400 font-mono mt-0.5">Health Score: {item.score}% ({item.status})</p>
+                      <div className="p-3 bg-[#0B0F19]/95 text-white border border-slate-700 shadow-2xl rounded-xl text-xs font-mono backdrop-blur-md">
+                        <p className="font-bold text-white font-sans text-sm">{item.name}</p>
+                        <p className="text-slate-400 text-[11px] mt-0.5">Plate: {item.plate}</p>
+                        <div className="mt-2 flex items-center gap-2 pt-2 border-t border-slate-800">
+                          <span
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: item.color }}
+                          />
+                          <span className="font-bold font-mono" style={{ color: item.color }}>
+                            Score: {item.score}% ({item.status})
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-cyan-400 mt-1 font-sans">
+                          Click bar to inspect asset diagnostics →
+                        </p>
                       </div>
                     );
                   }
@@ -153,7 +185,7 @@ export const VehicleFleetVisualOverview: React.FC<VehicleFleetVisualOverviewProp
               />
               <Bar
                 dataKey="score"
-                radius={[0, 4, 4, 0]}
+                radius={[0, 6, 6, 0]}
                 onClick={(entry) => {
                   const item = entry as unknown as HealthRankItem;
                   if (item?.id && onSelectVehicle) onSelectVehicle(item.id);
@@ -169,37 +201,62 @@ export const VehicleFleetVisualOverview: React.FC<VehicleFleetVisualOverviewProp
         </div>
       </Card>
 
-      {/* Chart 10: Fuel Level Comparison (4 cols) */}
+      {/* Module 2: Fleet Fuel Reserves & Energy Horizon (4 cols) */}
       <Card
-        className="lg:col-span-4 flex flex-col shadow-card"
+        className="lg:col-span-4 flex flex-col shadow-2xl bg-[#111C2D] border border-slate-800 hover:border-slate-700 transition-all rounded-2xl overflow-hidden"
         header={
-          <div className="flex items-center gap-2">
-            <Fuel className="w-4 h-4 text-cyan-400" />
-            <span className="font-semibold text-xs text-slate-100 font-sans">
-              Fleet Fuel Reserves
-            </span>
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg bg-cyan-950/60 border border-cyan-500/40 text-cyan-400">
+              <Fuel className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="font-bold text-sm sm:text-base text-white font-sans block">
+                Fuel Reserves & Range
+              </span>
+              <span className="text-[10px] text-slate-400 font-mono">
+                Tank Level & Depletion Horizon
+              </span>
+            </div>
           </div>
         }
         headerAction={
-          <span className="text-[10px] font-mono text-slate-400">
-            Tank Levels (%)
+          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-[#0B0F19] border border-slate-800 text-cyan-400">
+            CAPACITY %
           </span>
         }
       >
-        <div className="h-44 w-full relative">
+        <div className="h-52 w-full relative pt-2">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={fuelData} margin={{ top: 8, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} vertical={false} />
-              <XAxis dataKey="name" stroke={CHART_COLORS.axisBorder} tick={{ fill: CHART_COLORS.axisText, fontSize: 10, fontFamily: "monospace" }} tickLine={false} />
-              <YAxis domain={[0, 100]} stroke={CHART_COLORS.axisBorder} tick={{ fill: CHART_COLORS.axisText, fontSize: 10, fontFamily: "monospace" }} tickLine={false} />
+            <BarChart data={fuelData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="2 2" stroke="#1E293B" vertical={false} />
+              <XAxis
+                dataKey="name"
+                stroke="#64748B"
+                tick={{ fill: "#F8FAFC", fontSize: 10, fontFamily: "monospace", fontWeight: 600 }}
+                tickLine={false}
+              />
+              <YAxis
+                domain={[0, 100]}
+                stroke="#64748B"
+                tick={{ fill: "#94A3B8", fontSize: 10, fontFamily: "monospace" }}
+                tickLine={false}
+              />
               <Tooltip
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const item = payload[0].payload as FuelItem;
                     return (
-                      <div className="p-2.5 bg-[#111C2D]/95 text-white border border-[#1F2E47] shadow-xl rounded-xl text-xs font-mono">
-                        <p className="font-bold text-white font-sans">{item.fullName}</p>
-                        <p className="text-cyan-400 font-mono mt-0.5">Fuel Level: {item.fuel}%</p>
+                      <div className="p-3 bg-[#0B0F19]/95 text-white border border-slate-700 shadow-2xl rounded-xl text-xs font-mono backdrop-blur-md">
+                        <p className="font-bold text-white font-sans text-sm">{item.fullName}</p>
+                        <p className="text-cyan-400 font-mono mt-1 font-bold">
+                          Fuel Level: {item.fuel}%
+                        </p>
+                        <p className="text-slate-400 text-[10px] mt-0.5">
+                          Est. Range: ~{Math.round(item.fuel * 7.5)} km
+                        </p>
+                        <p className="text-[10px] text-cyan-400 mt-1 font-sans">
+                          Click bar to inspect asset diagnostics →
+                        </p>
                       </div>
                     );
                   }
@@ -208,7 +265,7 @@ export const VehicleFleetVisualOverview: React.FC<VehicleFleetVisualOverviewProp
               />
               <Bar
                 dataKey="fuel"
-                radius={[4, 4, 0, 0]}
+                radius={[6, 6, 0, 0]}
                 onClick={(entry) => {
                   const item = entry as unknown as FuelItem;
                   if (item?.id && onSelectVehicle) onSelectVehicle(item.id);
@@ -224,46 +281,65 @@ export const VehicleFleetVisualOverview: React.FC<VehicleFleetVisualOverviewProp
         </div>
       </Card>
 
-      {/* Chart 12: Fleet Sensor Switcher (4 cols) */}
+      {/* Module 3: Fleet Multi-Sensor Distribution (4 cols) */}
       <Card
-        className="lg:col-span-4 flex flex-col shadow-card"
+        className="lg:col-span-4 flex flex-col shadow-2xl bg-[#111C2D] border border-slate-800 hover:border-slate-700 transition-all rounded-2xl overflow-hidden"
         header={
-          <div className="flex items-center gap-2">
-            <Sliders className="w-4 h-4 text-purple-400" />
-            <span className="font-semibold text-xs text-slate-100 font-sans">
-              Fleet Sensor Distribution
-            </span>
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg bg-purple-950/60 border border-purple-500/40 text-purple-400">
+              <Sliders className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="font-bold text-sm sm:text-base text-white font-sans block">
+                Sensor Variance Matrix
+              </span>
+              <span className="text-[10px] text-slate-400 font-mono">
+                Live Subsystem Dispersion
+              </span>
+            </div>
           </div>
         }
         headerAction={
           <select
             value={selectedSensorMetric}
             onChange={(e) => setSelectedSensorMetric(e.target.value as TelemetryMetricKey)}
-            className="px-2.5 py-1 bg-[#0B0F19] border border-[#1F2E47] rounded-lg text-[10px] font-mono text-slate-200 focus:outline-none focus:border-blue-500 cursor-pointer"
+            className="px-2.5 py-1 bg-[#0B0F19] border border-slate-700 rounded-lg text-[11px] font-mono font-bold text-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer shadow-sm"
           >
             <option value="engine_temp_c">Coolant (°C)</option>
             <option value="oil_pressure_psi">Oil Press (PSI)</option>
             <option value="speed">Speed (km/h)</option>
-            <option value="rpm">RPM</option>
+            <option value="rpm">Engine RPM</option>
             <option value="battery_voltage">Battery (V)</option>
           </select>
         }
       >
-        <div className="h-44 w-full relative">
+        <div className="h-52 w-full relative pt-2">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={sensorData} margin={{ top: 8, right: 10, left: -15, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} vertical={false} />
-              <XAxis dataKey="name" stroke={CHART_COLORS.axisBorder} tick={{ fill: CHART_COLORS.axisText, fontSize: 10, fontFamily: "monospace" }} tickLine={false} />
-              <YAxis stroke={CHART_COLORS.axisBorder} tick={{ fill: CHART_COLORS.axisText, fontSize: 10, fontFamily: "monospace" }} tickLine={false} />
+            <BarChart data={sensorData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="2 2" stroke="#1E293B" vertical={false} />
+              <XAxis
+                dataKey="name"
+                stroke="#64748B"
+                tick={{ fill: "#F8FAFC", fontSize: 10, fontFamily: "monospace", fontWeight: 600 }}
+                tickLine={false}
+              />
+              <YAxis
+                stroke="#64748B"
+                tick={{ fill: "#94A3B8", fontSize: 10, fontFamily: "monospace" }}
+                tickLine={false}
+              />
               <Tooltip
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const item = payload[0].payload as SensorItem;
                     return (
-                      <div className="p-2.5 bg-[#111C2D]/95 text-white border border-[#1F2E47] shadow-xl rounded-xl text-xs font-mono">
-                        <p className="font-bold text-white font-sans">{item.fullName}</p>
-                        <p className="text-purple-400 font-mono mt-0.5">
+                      <div className="p-3 bg-[#0B0F19]/95 text-white border border-slate-700 shadow-2xl rounded-xl text-xs font-mono backdrop-blur-md">
+                        <p className="font-bold text-white font-sans text-sm">{item.fullName}</p>
+                        <p className="text-purple-400 font-mono mt-1 font-bold">
                           {activeMeta.label}: {item.value} {item.unit}
+                        </p>
+                        <p className="text-[10px] text-cyan-400 mt-1 font-sans">
+                          Click bar to inspect asset diagnostics →
                         </p>
                       </div>
                     );
@@ -273,7 +349,7 @@ export const VehicleFleetVisualOverview: React.FC<VehicleFleetVisualOverviewProp
               />
               <Bar
                 dataKey="value"
-                radius={[4, 4, 0, 0]}
+                radius={[6, 6, 0, 0]}
                 onClick={(entry) => {
                   const item = entry as unknown as SensorItem;
                   if (item?.id && onSelectVehicle) onSelectVehicle(item.id);

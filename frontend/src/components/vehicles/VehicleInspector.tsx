@@ -14,7 +14,12 @@ import { VehicleAlertsPanel } from "./VehicleAlertsPanel";
 import { Button } from "../common/Button";
 import { StatusBadge } from "../common/StatusBadge";
 import { Badge } from "../common/Badge";
-import { ArrowLeft, Zap } from "lucide-react";
+import {
+  ArrowLeft,
+  Zap,
+  Radio,
+  ChevronRight,
+} from "lucide-react";
 import { clsx } from "clsx";
 
 export interface VehicleInspectorProps {
@@ -68,7 +73,7 @@ export const VehicleInspector: React.FC<VehicleInspectorProps> = ({
     refetchInterval: 4000,
   });
 
-  // 5. Initial Telemetry History from REST (seeds history if Zustand buffer has few points)
+  // 5. Initial Telemetry History from REST
   const { data: initialHistoryData } = useQuery({
     queryKey: ["vehicle-history", vehicleId],
     queryFn: () => telemetryApi.getVehicleHistory(vehicleId, 50),
@@ -95,50 +100,79 @@ export const VehicleInspector: React.FC<VehicleInspectorProps> = ({
 
   return (
     <div className={clsx("space-y-6 select-none", className)}>
-      {/* Top Navigation & Action Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1F2E47] pb-4">
-        <div className="flex items-center gap-3">
-          {onBackToRoster && (
-            <button
-              onClick={onBackToRoster}
-              className="p-2.5 rounded-xl bg-[#111C2D] border border-[#1F2E47] text-slate-300 hover:text-white hover:bg-[#16253B] hover:border-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/40 cursor-pointer shadow-md"
-              aria-label="Back to fleet roster"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-          )}
-
-          <div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight font-sans">{vehicle.name}</h1>
-              <span className="text-xs font-mono px-2.5 py-0.5 rounded-lg bg-[#0B0F19] text-cyan-400 border border-[#1F2E47] font-semibold">
-                {vehicle.license_plate}
-              </span>
-              <StatusBadge status={vehicle.health_status || "GOOD"} size="sm" />
-              {activeScenario && (
-                <Badge variant="warning" size="sm" dot>
-                  SIMULATION: {activeScenario}
-                </Badge>
-              )}
-            </div>
-            <p className="text-xs text-slate-400 font-sans mt-1">
-              VIN: <span className="font-mono text-slate-300">{vehicle.vin}</span> · Type: <span className="text-slate-300">{vehicle.vehicle_type}</span> · Driver:{" "}
-              <span className="text-slate-200 font-medium">{vehicle.assigned_driver_id ? "Assigned" : "Unassigned"}</span>
-            </p>
-          </div>
+      {/* ==================================================
+          TOP BREADCRUMB & MISSION WORKSTATION HEADER
+          ================================================== */}
+      <div className="space-y-3 border-b border-slate-800 pb-5">
+        {/* Breadcrumb Path */}
+        <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+          <button
+            onClick={onBackToRoster}
+            className="hover:text-cyan-400 transition-colors cursor-pointer flex items-center gap-1 font-bold"
+          >
+            <span>FLEET REGISTRY</span>
+          </button>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
+          <span className="text-slate-300 font-bold">ASSET DIAGNOSTICS</span>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
+          <span className="text-cyan-400 font-bold">{vehicle.license_plate}</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          {onOpenSimulator && (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={onOpenSimulator}
-              leftIcon={<Zap className="w-3.5 h-3.5 text-amber-500" />}
-            >
-              Simulator Controls
-            </Button>
-          )}
+        {/* Identity & Action Cockpit */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            {onBackToRoster && (
+              <button
+                onClick={onBackToRoster}
+                className="p-3 rounded-2xl bg-[#111C2D] border border-slate-700 text-slate-300 hover:text-white hover:bg-[#16253B] hover:border-cyan-500 transition-all cursor-pointer shadow-lg group"
+                aria-label="Back to fleet roster"
+              >
+                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
+              </button>
+            )}
+
+            <div>
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans">
+                  {vehicle.name}
+                </h1>
+                <span className="text-xs font-mono px-3 py-1 rounded-xl bg-[#0B0F19] text-cyan-400 border border-slate-700 font-bold tracking-wider shadow-sm">
+                  {vehicle.license_plate}
+                </span>
+                <StatusBadge status={vehicle.health_status || "GOOD"} size="md" />
+                {activeScenario && (
+                  <Badge variant="warning" size="md" dot className="font-mono">
+                    SIMULATION: {activeScenario}
+                  </Badge>
+                )}
+              </div>
+              <p className="text-xs sm:text-sm text-slate-400 font-sans mt-1">
+                VIN: <span className="font-mono text-slate-200 font-semibold">{vehicle.vin}</span> ·
+                Model: <span className="text-slate-200 font-semibold">{vehicle.model || vehicle.vehicle_type}</span> ·
+                Status: <span className="text-emerald-400 font-bold">{vehicle.status}</span> ·
+                Telemetry: <span className="text-cyan-400 font-mono font-bold">WSS LIVE</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-[#111C2D] border border-slate-800 text-xs font-mono text-slate-300 shadow-sm">
+              <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
+              <span>LIVE BUFFER: {combinedHistory.length} PKTS</span>
+            </div>
+
+            {onOpenSimulator && (
+              <Button
+                size="md"
+                variant="secondary"
+                onClick={onOpenSimulator}
+                leftIcon={<Zap className="w-4 h-4 text-amber-400" />}
+                className="bg-[#111C2D] border-slate-700 hover:bg-[#16253B] text-slate-100 font-semibold shadow-card"
+              >
+                Simulator Cockpit
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -152,8 +186,8 @@ export const VehicleInspector: React.FC<VehicleInspectorProps> = ({
         onOpenSimulator={onOpenSimulator}
       />
 
-      {/* 2. Powertrain Health & Predictive Maintenance Cards Side-by-Side */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* 2. Powertrain Health & Predictive Maintenance Workstations Side-by-Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         <VehicleHealthCard
           health={healthData}
           telemetry={liveTelemetry}
@@ -170,11 +204,11 @@ export const VehicleInspector: React.FC<VehicleInspectorProps> = ({
         />
       </div>
 
-      {/* 3. Powertrain Time-Series Telemetry Charts */}
+      {/* 3. Powertrain Multi-Sensor Time-Series Telemetry Charts */}
       <TelemetryHistoryChart history={combinedHistory} />
 
       {/* 4. Anomaly Intelligence & Alerts Context Side-by-Side */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         <AnomalyIntelligencePanel
           anomalies={anomaliesData?.anomalies || []}
           isLoading={isLoadingAnomalies}
@@ -187,4 +221,3 @@ export const VehicleInspector: React.FC<VehicleInspectorProps> = ({
     </div>
   );
 };
-

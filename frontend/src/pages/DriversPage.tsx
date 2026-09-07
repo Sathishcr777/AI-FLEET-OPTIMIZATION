@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { driversApi } from "../api/drivers";
 import { vehiclesApi } from "../api/vehicles";
-import { Driver, Vehicle } from "../types/api";
+import { Vehicle } from "../types/api";
 import { DriverInspector } from "../components/drivers/DriverInspector";
 import { DriverSafetyRankingChart } from "../components/drivers/DriverSafetyRankingChart";
 import { ScenarioDrawer } from "../components/layout/ScenarioDrawer";
@@ -13,7 +13,6 @@ import { StatusBadge } from "../components/common/StatusBadge";
 import { SeverityBadge } from "../components/common/SeverityBadge";
 import { Badge } from "../components/common/Badge";
 import { Button } from "../components/common/Button";
-import { Table, Column } from "../components/common/Table";
 import { Skeleton } from "../components/common/Skeleton";
 import { ErrorState } from "../components/common/ErrorState";
 import {
@@ -55,8 +54,8 @@ export const DriversPage: React.FC = () => {
     queryFn: () => vehiclesApi.list({ limit: 100 }),
   });
 
-  const drivers = driversData || [];
-  const vehicles = vehiclesData?.vehicles || [];
+  const drivers = useMemo(() => driversData || [], [driversData]);
+  const vehicles = useMemo(() => vehiclesData?.vehicles || [], [vehiclesData?.vehicles]);
 
   // Map driver ID to assigned vehicle
   const driverVehicleMap = useMemo(() => {
@@ -128,14 +127,15 @@ export const DriversPage: React.FC = () => {
   if (isLoadingDrivers) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-10 w-72" />
+        <Skeleton className="h-12 w-80 rounded-xl" />
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <Skeleton className="h-24 w-full rounded-xl" />
-          <Skeleton className="h-24 w-full rounded-xl" />
-          <Skeleton className="h-24 w-full rounded-xl" />
-          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-28 w-full rounded-2xl" />
+          <Skeleton className="h-28 w-full rounded-2xl" />
+          <Skeleton className="h-28 w-full rounded-2xl" />
+          <Skeleton className="h-28 w-full rounded-2xl" />
         </div>
-        <Skeleton className="h-96 w-full rounded-xl" />
+        <Skeleton className="h-64 w-full rounded-2xl" />
+        <Skeleton className="h-96 w-full rounded-2xl" />
       </div>
     );
   }
@@ -168,178 +168,92 @@ export const DriversPage: React.FC = () => {
     );
   }
 
-  // Table Columns Definition
-  const columns: Column<Driver>[] = [
-    {
-      key: "name",
-      header: "Operator Profile",
-      render: (d: Driver) => (
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-[#0B0F19] text-blue-400 border border-[#1F2E47] shrink-0">
-            <Users className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="font-semibold text-white font-sans text-xs">{d.name}</div>
-            <div className="text-[11px] text-slate-400 font-mono mt-0.5">
-              CDL: {d.license_number} · {d.phone || "No phone"}
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "status",
-      header: "Duty Status",
-      render: (d: Driver) => <StatusBadge status={d.status} size="sm" />,
-    },
-    {
-      key: "assigned_vehicle",
-      header: "Assigned Asset",
-      render: (d: Driver) => {
-        const vehicle = driverVehicleMap.get(d.id);
-        return vehicle ? (
-          <div className="flex items-center gap-1.5 font-mono text-xs text-slate-200">
-            <Truck className="w-3.5 h-3.5 text-blue-400" />
-            <span className="font-semibold text-cyan-400">{vehicle.name}</span>
-            <span className="text-slate-400">({vehicle.license_plate})</span>
-          </div>
-        ) : (
-          <span className="text-slate-500 font-mono text-xs">Unassigned</span>
-        );
-      },
-    },
-    {
-      key: "safety_score",
-      header: "Safety Index",
-      render: (d: Driver) => {
-        const score = d.overall_safety_score ?? 100;
-        const color =
-          score >= 80 ? "text-emerald-400" : score >= 60 ? "text-amber-400" : "text-rose-400";
-        const progressBg =
-          score >= 80 ? "bg-emerald-400 shadow-glow-emerald" : score >= 60 ? "bg-amber-400 shadow-glow-amber" : "bg-rose-500 shadow-glow-crimson";
-
-        return (
-          <div className="w-32 space-y-1 font-mono text-xs">
-            <div className="flex items-center justify-between">
-              <span className={clsx("font-bold", color)}>{score.toFixed(1)} / 100</span>
-            </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden border border-slate-700/50">
-              <div
-                className={clsx("h-full rounded-full", progressBg)}
-                style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
-              />
-            </div>
-          </div>
-        );
-      },
-    },
-    {
-      key: "risk_level",
-      header: "Risk Tier",
-      render: (d: Driver) => {
-        const score = d.overall_safety_score ?? 100;
-        const risk =
-          score >= 80 ? "LOW" : score >= 60 ? "MEDIUM" : score >= 40 ? "HIGH" : "CRITICAL";
-        return <SeverityBadge severity={risk} size="sm" />;
-      },
-    },
-    {
-      key: "distance",
-      header: "Total Distance",
-      render: (d: Driver) => (
-        <span className="font-mono text-xs text-slate-300">
-          {(d.total_distance_km || 0).toLocaleString()} km
-        </span>
-      ),
-    },
-    {
-      key: "actions",
-      header: "Action",
-      align: "right",
-      render: (d: Driver) => (
-        <Button
-          size="sm"
-          variant="secondary"
-          onClick={(e: React.MouseEvent) => {
-            e.stopPropagation();
-            handleSelectDriver(d.id);
-          }}
-          leftIcon={<Eye className="w-3.5 h-3.5" />}
-        >
-          Inspect
-        </Button>
-      ),
-    },
-  ];
-
   return (
     <div className="w-full max-w-[1920px] mx-auto space-y-6 pb-12 select-none">
-      {/* Top Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1F2E47] pb-4">
+      {/* ==================================================
+          TOP COMMAND HEADER
+          ================================================== */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/90 pb-5">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <ShieldCheck className="w-6 h-6 text-blue-400" />
-            <span>Driver Safety & Behavioral Analytics</span>
-            <Badge variant="brand" size="sm">
-              {totalDrivers} OPERATORS
-            </Badge>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1 font-sans">
-            Commercial operator safety scoring, driving behavior infractions, and coaching intelligence.
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400 shadow-glowBlue">
+              <Users className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans">
+                  Driver Safety & Behavioral Analytics
+                </h1>
+                <Badge variant="brand" size="md" className="font-mono text-xs">
+                  {totalDrivers} OPERATORS REGISTERED
+                </Badge>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-sans">
+                Commercial driver risk modeling, behavioral event scoring, coaching protocols, and CDL registry.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <Button
             size="md"
             variant="secondary"
             onClick={() => setScenarioDrawerOpen(true)}
             leftIcon={<Zap className="w-4 h-4 text-amber-400" />}
+            className="bg-[#111C2D] border-slate-700 hover:bg-[#16253B] text-white shadow-card font-semibold"
           >
             Scenario Cockpit
           </Button>
         </div>
       </div>
 
-      {/* KPI Cards Strip */}
+      {/* ==================================================
+          DRIVER SAFETY KPI STRIP
+          ================================================== */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Active Drivers"
+          title="Active Duty Drivers"
           value={activeDrivers}
-          subtext={`of ${totalDrivers} registered drivers`}
-          icon={<Users className="w-4 h-4 text-blue-400" />}
+          unit={`/ ${totalDrivers}`}
+          subtext={`of ${totalDrivers} certified commercial operators`}
+          icon={<Users className="w-5 h-5 text-blue-400" />}
         />
         <StatCard
-          title="Fleet Safety Index"
+          title="Fleet Safety Score"
           value={avgSafetyScore.toFixed(1)}
           unit="%"
-          subtext={avgSafetyScore >= 80 ? "Optimal fleet baseline" : "Coaching required"}
-          icon={<ShieldCheck className="w-4 h-4 text-emerald-400" />}
+          subtext={avgSafetyScore >= 80 ? "Optimal fleet benchmark (>80%)" : "Coaching cycle recommended"}
+          icon={<ShieldCheck className="w-5 h-5 text-emerald-400" />}
         />
         <StatCard
           title="High-Risk Operators"
           value={highRiskCount}
-          subtext="Score below 60/100"
-          icon={<AlertTriangle className="w-4 h-4 text-rose-400" />}
+          subtext="Score below 60/100 threshold"
+          icon={<AlertTriangle className="w-5 h-5 text-rose-400" />}
           variant={highRiskCount > 0 ? "criticalGlow" : "default"}
         />
         <StatCard
           title="Top Safety Tier"
           value={drivers.filter((d) => (d.overall_safety_score ?? 100) >= 90).length}
-          subtext="Exemplary commercial record"
-          icon={<Award className="w-4 h-4 text-amber-400" />}
+          subtext="Score ≥ 90% exemplary record"
+          icon={<Award className="w-5 h-5 text-amber-400" />}
         />
       </div>
 
-      {/* Driver Safety Score Ranking Leaderboard */}
+      {/* ==================================================
+          DRIVER SAFETY SCORE RANKING LEADERBOARD
+          ================================================== */}
       <DriverSafetyRankingChart
         drivers={drivers}
         onSelectDriver={handleSelectDriver}
-        height={240}
+        height={260}
       />
 
-      {/* Search & Filter Toolbar */}
-      <div className="p-4 rounded-2xl bg-[#111C2D] border border-[#1F2E47] shadow-card flex flex-col md:flex-row md:items-center justify-between gap-3.5">
+      {/* ==================================================
+          SEARCH & FILTER TOOLBAR
+          ================================================== */}
+      <div className="p-4 rounded-2xl bg-[#111C2D] border border-slate-800 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Search Input */}
         <div className="relative flex-1 max-w-md">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -347,22 +261,22 @@ export const DriversPage: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search driver by name, CDL license, or phone..."
-            className="w-full pl-10 pr-3.5 py-2.5 bg-[#0B0F19] border border-[#1F2E47] rounded-xl text-white placeholder:text-slate-500 text-xs sm:text-sm font-sans focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all shadow-subtle"
+            placeholder="Search operator by name, CDL license, or phone..."
+            className="w-full pl-10 pr-3.5 py-2 bg-[#0B0F19] border border-slate-700/80 rounded-xl text-slate-100 placeholder:text-slate-500 text-xs sm:text-sm font-sans focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all shadow-subtle"
           />
         </div>
 
         {/* Filters Group */}
-        <div className="flex flex-wrap items-center gap-2.5 font-mono text-xs">
+        <div className="flex flex-wrap items-center gap-3 font-mono text-xs">
           {/* Status Filter */}
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] uppercase text-slate-400 font-semibold font-sans">Status:</span>
+            <span className="text-[11px] uppercase text-slate-400 font-bold font-sans">Status:</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-2.5 py-1.5 bg-[#0B0F19] border border-[#1F2E47] rounded-lg text-slate-200 text-xs focus:outline-none focus:border-blue-500 cursor-pointer"
+              className="px-3 py-1.5 bg-[#0B0F19] border border-slate-700 rounded-lg text-slate-100 text-xs focus:outline-none focus:border-blue-500 cursor-pointer shadow-sm"
             >
-              <option value="ALL">ALL ({drivers.length})</option>
+              <option value="ALL">ALL STATUS ({drivers.length})</option>
               <option value="ACTIVE">ACTIVE</option>
               <option value="ON_DUTY">ON DUTY</option>
               <option value="OFF_DUTY">OFF DUTY</option>
@@ -372,56 +286,170 @@ export const DriversPage: React.FC = () => {
 
           {/* Risk Filter */}
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] uppercase text-slate-400 font-semibold font-sans">Risk:</span>
+            <span className="text-[11px] uppercase text-slate-400 font-bold font-sans">Risk:</span>
             <select
               value={riskFilter}
               onChange={(e) => setRiskFilter(e.target.value)}
-              className="px-2.5 py-1.5 bg-[#0B0F19] border border-[#1F2E47] rounded-lg text-slate-200 text-xs focus:outline-none focus:border-blue-500 cursor-pointer"
+              className="px-3 py-1.5 bg-[#0B0F19] border border-slate-700 rounded-lg text-slate-100 text-xs focus:outline-none focus:border-blue-500 cursor-pointer shadow-sm"
             >
-              <option value="ALL">ALL RISKS</option>
-              <option value="LOW">LOW RISK (&gt;80)</option>
-              <option value="MEDIUM">MEDIUM (60-79)</option>
-              <option value="HIGH">HIGH (40-59)</option>
-              <option value="CRITICAL">CRITICAL (&lt;40)</option>
+              <option value="ALL">ALL RISK TIERS</option>
+              <option value="LOW">LOW RISK (≥80%)</option>
+              <option value="MEDIUM">MEDIUM (60-79%)</option>
+              <option value="HIGH">HIGH (40-59%)</option>
+              <option value="CRITICAL">CRITICAL (&lt;40%)</option>
             </select>
           </div>
 
           {/* Sort By */}
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] uppercase text-slate-400 font-semibold font-sans">Sort:</span>
+            <span className="text-[11px] uppercase text-slate-400 font-bold font-sans">Sort:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as "score_desc" | "score_asc" | "name" | "distance")}
-              className="px-2.5 py-1.5 bg-[#0B0F19] border border-[#1F2E47] rounded-lg text-slate-200 text-xs focus:outline-none focus:border-blue-500 cursor-pointer"
+              className="px-3 py-1.5 bg-[#0B0F19] border border-slate-700 rounded-lg text-slate-100 text-xs focus:outline-none focus:border-blue-500 cursor-pointer shadow-sm"
             >
-              <option value="score_desc">Safety Score (Highest)</option>
-              <option value="score_asc">Safety Score (Lowest)</option>
+              <option value="score_desc">Safety Score (Highest First)</option>
+              <option value="score_asc">Safety Score (Lowest First)</option>
               <option value="distance">Distance Traveled</option>
-              <option value="name">Name (A-Z)</option>
+              <option value="name">Operator Name (A-Z)</option>
             </select>
           </div>
         </div>
       </div>
 
-      {/* Driver Leaderboard Table Card */}
+      {/* ==================================================
+          COMMERCIAL OPERATOR REGISTRY MANIFEST
+          ================================================== */}
       <Card
-        className="overflow-hidden shadow-card"
+        className="overflow-hidden shadow-2xl bg-[#111C2D] border-slate-800 rounded-2xl"
         header={
           <div className="flex items-center justify-between w-full">
-            <span className="font-semibold text-sm text-slate-100 font-sans">Commercial Operator Registry</span>
+            <div className="flex items-center gap-2.5">
+              <Users className="w-5 h-5 text-blue-400" />
+              <span className="font-bold text-base text-white font-sans">
+                Commercial Operator Registry
+              </span>
+            </div>
             <span className="text-slate-400 font-mono text-xs">
-              Showing {filteredDrivers.length} of {drivers.length} operators
+              Displaying {filteredDrivers.length} of {drivers.length} operators
             </span>
           </div>
         }
       >
-        <Table<Driver>
-          columns={columns}
-          data={filteredDrivers}
-          keyExtractor={(d) => d.id}
-          onRowClick={(d) => handleSelectDriver(d.id)}
-          emptyMessage="No drivers match your active search and filter criteria."
-        />
+        <div className="overflow-x-auto">
+          <table className="w-full text-left font-sans text-xs sm:text-[13.5px]">
+            <thead>
+              <tr className="border-b border-slate-800 text-slate-400 text-xs uppercase font-mono font-bold bg-[#0B0F19]/80">
+                <th className="py-3.5 pl-5">Operator Profile</th>
+                <th className="py-3.5">Duty Status</th>
+                <th className="py-3.5">Assigned Asset</th>
+                <th className="py-3.5">Safety Index Score</th>
+                <th className="py-3.5">Risk Classification</th>
+                <th className="py-3.5">Logged Distance</th>
+                <th className="py-3.5 pr-5 text-right">Workstation</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/80">
+              {filteredDrivers.map((d) => {
+                const score = d.overall_safety_score ?? 100;
+                const risk =
+                  score >= 80 ? "LOW" : score >= 60 ? "MEDIUM" : score >= 40 ? "HIGH" : "CRITICAL";
+                const vehicle = driverVehicleMap.get(d.id);
+                const isCrit = risk === "CRITICAL" || score < 40;
+
+                return (
+                  <tr
+                    key={d.id}
+                    onClick={() => handleSelectDriver(d.id)}
+                    className={clsx(
+                      "hover:bg-[#16253B]/70 transition-all cursor-pointer group",
+                      isCrit && "bg-rose-950/15 hover:bg-rose-950/30"
+                    )}
+                  >
+                    <td className="py-4 pl-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-[#0B0F19] border border-slate-700 flex items-center justify-center text-blue-400 shrink-0 shadow-sm group-hover:border-cyan-500 transition-colors">
+                          <Users className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-white group-hover:text-cyan-400 transition-colors text-sm font-sans">
+                            {d.name}
+                          </div>
+                          <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                            CDL: {d.license_number} · {d.phone || "No phone"}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="py-4">
+                      <StatusBadge status={d.status} size="sm" />
+                    </td>
+
+                    <td className="py-4 font-mono text-xs">
+                      {vehicle ? (
+                        <div className="flex items-center gap-1.5 text-slate-200">
+                          <Truck className="w-3.5 h-3.5 text-cyan-400" />
+                          <span className="font-bold text-cyan-400">{vehicle.name}</span>
+                          <span className="text-slate-500">({vehicle.license_plate})</span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-500">Unassigned</span>
+                      )}
+                    </td>
+
+                    <td className="py-4">
+                      <div className="w-36 space-y-1.5 font-mono text-xs">
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={clsx(
+                              "font-bold",
+                              score >= 80 ? "text-emerald-400" : score >= 60 ? "text-amber-400" : "text-rose-400"
+                            )}
+                          >
+                            {score.toFixed(1)} / 100
+                          </span>
+                        </div>
+                        <div className="w-full bg-[#0B0F19] h-2 rounded-full overflow-hidden border border-slate-800">
+                          <div
+                            className={clsx(
+                              "h-full rounded-full transition-all",
+                              score >= 80 ? "bg-emerald-400" : score >= 60 ? "bg-amber-400" : "bg-rose-500"
+                            )}
+                            style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
+                          />
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="py-4">
+                      <SeverityBadge severity={risk} size="sm" />
+                    </td>
+
+                    <td className="py-4 font-mono text-xs text-slate-300 font-bold">
+                      {(d.total_distance_km || 0).toLocaleString()} km
+                    </td>
+
+                    <td className="py-4 pr-5 text-right">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
+                          handleSelectDriver(d.id);
+                        }}
+                        leftIcon={<Eye className="w-3.5 h-3.5 text-cyan-400" />}
+                        className="bg-[#16253B] border-slate-700 text-white hover:bg-blue-600 hover:border-blue-500 transition-all text-xs font-semibold"
+                      >
+                        Inspect
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </Card>
 
       {/* Scenario Injection Drawer */}

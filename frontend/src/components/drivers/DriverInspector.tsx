@@ -101,52 +101,52 @@ export const DriverInspector: React.FC<DriverInspectorProps> = ({
 
       {/* Driver Identity & Assigned Asset Summary Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-4 flex items-center gap-3.5 shadow-card">
-          <div className="p-2.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-600">
+        <Card className="p-4 flex items-center gap-3.5 shadow-card bg-[#111C2D] border border-[#1F2E47]">
+          <div className="p-2.5 rounded-xl bg-blue-950/60 border border-blue-500/30 text-blue-400">
             <IdCard className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[10px] uppercase font-sans text-slate-500 font-semibold">Commercial License</p>
-            <p className="text-sm font-bold font-mono text-slate-900 mt-0.5">{driver.license_number}</p>
+            <p className="text-[10px] uppercase font-sans text-slate-400 font-semibold font-mono">Commercial License</p>
+            <p className="text-sm font-bold font-mono text-white mt-0.5">{driver.license_number}</p>
           </div>
         </Card>
 
-        <Card className="p-4 flex items-center gap-3.5 shadow-card">
-          <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600">
+        <Card className="p-4 flex items-center gap-3.5 shadow-card bg-[#111C2D] border border-[#1F2E47]">
+          <div className="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-400">
             <Truck className="w-5 h-5" />
           </div>
           <div className="flex-1 truncate">
-            <p className="text-[10px] uppercase font-sans text-slate-500 font-semibold">Assigned Asset</p>
+            <p className="text-[10px] uppercase font-sans text-slate-400 font-semibold font-mono">Assigned Asset</p>
             {assignedVehicle ? (
-              <p className="text-sm font-bold text-slate-900 mt-0.5 truncate font-sans">
+              <p className="text-sm font-bold text-white mt-0.5 truncate font-sans">
                 {assignedVehicle.name}{" "}
-                <span className="text-xs font-mono text-slate-500 font-normal">({assignedVehicle.license_plate})</span>
+                <span className="text-xs font-mono text-cyan-400 font-normal">({assignedVehicle.license_plate})</span>
               </p>
             ) : (
-              <p className="text-sm font-mono text-slate-400 mt-0.5">UNASSIGNED</p>
+              <p className="text-sm font-mono text-slate-500 mt-0.5">UNASSIGNED</p>
             )}
           </div>
         </Card>
 
-        <Card className="p-4 flex items-center gap-3.5 shadow-card">
-          <div className="p-2.5 rounded-lg bg-purple-50 border border-purple-200 text-purple-600">
+        <Card className="p-4 flex items-center gap-3.5 shadow-card bg-[#111C2D] border border-[#1F2E47]">
+          <div className="p-2.5 rounded-xl bg-purple-950/60 border border-purple-500/30 text-purple-400">
             <Route className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[10px] uppercase font-sans text-slate-500 font-semibold">Completed Missions</p>
-            <p className="text-sm font-bold font-mono text-slate-900 mt-0.5">
+            <p className="text-[10px] uppercase font-sans text-slate-400 font-semibold font-mono">Completed Missions</p>
+            <p className="text-sm font-bold font-mono text-white mt-0.5">
               {driver.total_trips} trips · {driver.total_distance_km.toFixed(0)} km
             </p>
           </div>
         </Card>
 
-        <Card className="p-4 flex items-center gap-3.5 shadow-card">
-          <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-600">
+        <Card className="p-4 flex items-center gap-3.5 shadow-card bg-[#111C2D] border border-[#1F2E47]">
+          <div className="p-2.5 rounded-xl bg-amber-950/60 border border-amber-500/30 text-amber-400">
             <Phone className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[10px] uppercase font-sans text-slate-500 font-semibold">Dispatch Contact</p>
-            <p className="text-sm font-bold font-mono text-slate-900 mt-0.5">{driver.phone || "No direct phone"}</p>
+            <p className="text-[10px] uppercase font-sans text-slate-400 font-semibold font-mono">Dispatch Contact</p>
+            <p className="text-sm font-bold font-mono text-white mt-0.5">{driver.phone || "No direct phone"}</p>
           </div>
         </Card>
       </div>

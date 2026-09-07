@@ -110,8 +110,9 @@ export const AnalyticsPage: React.FC = () => {
   const telemetryHistory = useMemo(() => historyData?.records || [], [historyData?.records]);
 
   // 6. Fetch Maintenance Predictions for all vehicles
+  const vehicleIdsKey = useMemo(() => vehicles.map((v) => v.id).join(","), [vehicles]);
   const { data: predictionsMap = {} } = useQuery({
-    queryKey: ["all-maintenance-predictions", vehicles.map((v) => v.id).join(",")],
+    queryKey: ["all-maintenance-predictions", vehicleIdsKey],
     queryFn: async () => {
       const map: Record<string, MaintenancePredictionResponse> = {};
       for (const v of vehicles) {
@@ -128,8 +129,9 @@ export const AnalyticsPage: React.FC = () => {
   });
 
   // 7. Fetch Driver Analytics for all drivers
+  const driverIdsKey = useMemo(() => drivers.map((d) => d.id).join(","), [drivers]);
   const { data: driverAnalyticsMap = {} } = useQuery({
-    queryKey: ["all-driver-analytics", drivers.map((d) => d.id).join(",")],
+    queryKey: ["all-driver-analytics", driverIdsKey],
     queryFn: async () => {
       const map: Record<string, DriverAnalyticsResponse> = {};
       for (const d of drivers) {
@@ -188,12 +190,8 @@ export const AnalyticsPage: React.FC = () => {
   // Periodic Telemetry Snapshot Record into Zustand
   useEffect(() => {
     if (vehicles.length > 0) {
-      const nominalCount = vehicles.filter(
-        (v) => v.health_status === "GOOD"
-      ).length;
-      const degradedCount = vehicles.filter(
-        (v) => v.health_status === "WARNING"
-      ).length;
+      const nominalCount = vehicles.filter((v) => v.health_status === "GOOD").length;
+      const degradedCount = vehicles.filter((v) => v.health_status === "WARNING").length;
       const criticalCount = vehicles.filter((v) => v.health_status === "CRITICAL").length;
 
       recordFleetSnapshot({
@@ -221,16 +219,16 @@ export const AnalyticsPage: React.FC = () => {
   if (isLoadingVehicles && vehicles.length === 0) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-10 w-72" />
+        <Skeleton className="h-12 w-80 rounded-xl" />
         <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
-          <Skeleton className="h-20 w-full rounded-xl" />
-          <Skeleton className="h-20 w-full rounded-xl" />
-          <Skeleton className="h-20 w-full rounded-xl" />
-          <Skeleton className="h-20 w-full rounded-xl" />
-          <Skeleton className="h-20 w-full rounded-xl" />
-          <Skeleton className="h-20 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
         </div>
-        <Skeleton className="h-96 w-full rounded-xl" />
+        <Skeleton className="h-96 w-full rounded-2xl" />
       </div>
     );
   }
@@ -246,24 +244,34 @@ export const AnalyticsPage: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto space-y-6 pb-12">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1F2E47] pb-4">
+    <div className="w-full max-w-[1920px] mx-auto space-y-6 pb-12 select-none">
+      {/* ==================================================
+          TOP COMMAND HEADER
+          ================================================== */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/90 pb-5">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5 font-sans">
-            <BarChart3 className="w-6 h-6 text-blue-400" />
-            <span>Fleet Analytics & Executive Intelligence</span>
-            <Badge variant="brand" size="sm">
-              AI / ML METRICS
-            </Badge>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-sans">
-            Fleet health distribution, predictive maintenance risk, driver safety analytics, and telematics anomaly trends.
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400 shadow-glowBlue">
+              <BarChart3 className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans">
+                  Fleet Analytics & Executive Intelligence Laboratory
+                </h1>
+                <Badge variant="brand" size="md" className="font-mono text-xs">
+                  AI / ML METRICS HUB
+                </Badge>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-sans">
+                Predictive failure modeling, driver risk matrix, multi-sensor telematics time-series, and AI dispatch action plan.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Action Controls & Data Freshness */}
-        <div className="flex flex-wrap items-center gap-2.5 font-sans text-xs sm:text-sm">
+        <div className="flex flex-wrap items-center gap-3 font-sans text-xs sm:text-sm">
           {/* Live Status Badge */}
           <LiveStatusBadge
             isLive={connectionStatus === "CONNECTED"}
@@ -273,9 +281,9 @@ export const AnalyticsPage: React.FC = () => {
           />
 
           {/* Data Freshness Indicator */}
-          <div className="flex items-center gap-2 px-3 py-2 bg-[#111C2D] border border-[#1F2E47] rounded-xl text-slate-300 shadow-card">
+          <div className="flex items-center gap-2 px-3.5 py-2 bg-[#111C2D] border border-slate-800 rounded-xl text-slate-300 shadow-card">
             <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
-            <span className="text-xs font-mono font-medium">
+            <span className="text-xs font-mono font-bold">
               Synced {lastRefreshed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
             </span>
           </div>
@@ -286,11 +294,11 @@ export const AnalyticsPage: React.FC = () => {
             <select
               value={sampleLimit}
               onChange={(e) => setSampleLimit(Number(e.target.value))}
-              className="px-3 py-2 bg-[#0B0F19] border border-[#1F2E47] rounded-xl text-slate-100 text-xs sm:text-sm font-mono font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 shadow-card cursor-pointer"
+              className="px-3 py-2 bg-[#0B0F19] border border-slate-700 rounded-xl text-slate-100 text-xs sm:text-sm font-mono font-bold focus:outline-none focus:border-blue-500 shadow-card cursor-pointer"
             >
-              <option value={50}>50 Pkts</option>
-              <option value={100}>100 Pkts</option>
-              <option value={200}>200 Pkts</option>
+              <option value={50}>50 Packets</option>
+              <option value={100}>100 Packets</option>
+              <option value={200}>200 Packets</option>
             </select>
           </div>
 
@@ -300,8 +308,9 @@ export const AnalyticsPage: React.FC = () => {
             variant="secondary"
             onClick={handleRefreshAll}
             leftIcon={<RotateCcw className="w-4 h-4 text-slate-300" />}
+            className="bg-[#111C2D] border-slate-700 hover:bg-[#16253B] text-white shadow-card font-semibold"
           >
-            Refresh
+            Refresh Data
           </Button>
         </div>
       </div>
@@ -318,14 +327,14 @@ export const AnalyticsPage: React.FC = () => {
       />
 
       {/* 2. Structured Section Tab Navigator */}
-      <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-[#111C2D] rounded-2xl border border-[#1F2E47] text-xs sm:text-[13px] font-sans shadow-card">
+      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-[#111C2D] rounded-2xl border border-slate-800 text-xs sm:text-[13px] font-sans shadow-2xl">
         <button
           type="button"
           onClick={() => setActiveTab("ALL")}
           className={clsx(
-            "flex items-center gap-2 px-3.5 py-2 rounded-xl font-semibold transition-all cursor-pointer",
+            "flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all cursor-pointer",
             activeTab === "ALL"
-              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              ? "bg-blue-600 text-white shadow-glowBlue border border-blue-500"
               : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
@@ -337,13 +346,13 @@ export const AnalyticsPage: React.FC = () => {
           type="button"
           onClick={() => setActiveTab("FLEET")}
           className={clsx(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
+            "flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-bold transition-all cursor-pointer",
             activeTab === "FLEET"
-              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              ? "bg-blue-600 text-white shadow-glowBlue border border-blue-500"
               : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Activity className="w-3.5 h-3.5 text-emerald-400" />
+          <Activity className="w-4 h-4 text-emerald-400" />
           <span>Fleet Health (Ch 25-26)</span>
         </button>
 
@@ -351,13 +360,13 @@ export const AnalyticsPage: React.FC = () => {
           type="button"
           onClick={() => setActiveTab("VEHICLES")}
           className={clsx(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
+            "flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-bold transition-all cursor-pointer",
             activeTab === "VEHICLES"
-              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              ? "bg-blue-600 text-white shadow-glowBlue border border-blue-500"
               : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Truck className="w-3.5 h-3.5 text-blue-400" />
+          <Truck className="w-4 h-4 text-blue-400" />
           <span>Vehicle Intel (Ch 27-29)</span>
         </button>
 
@@ -365,13 +374,13 @@ export const AnalyticsPage: React.FC = () => {
           type="button"
           onClick={() => setActiveTab("MAINTENANCE")}
           className={clsx(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
+            "flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-bold transition-all cursor-pointer",
             activeTab === "MAINTENANCE"
-              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              ? "bg-blue-600 text-white shadow-glowBlue border border-blue-500"
               : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Wrench className="w-3.5 h-3.5 text-amber-400" />
+          <Wrench className="w-4 h-4 text-amber-400" />
           <span>Predictive Maint (Ch 30-32)</span>
         </button>
 
@@ -379,13 +388,13 @@ export const AnalyticsPage: React.FC = () => {
           type="button"
           onClick={() => setActiveTab("DRIVERS")}
           className={clsx(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
+            "flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-bold transition-all cursor-pointer",
             activeTab === "DRIVERS"
-              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              ? "bg-blue-600 text-white shadow-glowBlue border border-blue-500"
               : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Users className="w-3.5 h-3.5 text-emerald-400" />
+          <Users className="w-4 h-4 text-emerald-400" />
           <span>Driver Safety (Ch 33-34)</span>
         </button>
 
@@ -393,13 +402,13 @@ export const AnalyticsPage: React.FC = () => {
           type="button"
           onClick={() => setActiveTab("ALERTS")}
           className={clsx(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
+            "flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-bold transition-all cursor-pointer",
             activeTab === "ALERTS"
-              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              ? "bg-blue-600 text-white shadow-glowBlue border border-blue-500"
               : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+          <ShieldAlert className="w-4 h-4 text-rose-400" />
           <span>Incident Triage (Ch 35-37)</span>
         </button>
 
@@ -407,13 +416,13 @@ export const AnalyticsPage: React.FC = () => {
           type="button"
           onClick={() => setActiveTab("TELEMETRY")}
           className={clsx(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
+            "flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-bold transition-all cursor-pointer",
             activeTab === "TELEMETRY"
-              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              ? "bg-blue-600 text-white shadow-glowBlue border border-blue-500"
               : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Activity className="w-3.5 h-3.5 text-purple-400" />
+          <Activity className="w-4 h-4 text-purple-400" />
           <span>Live Telematics (Ch 38-43)</span>
         </button>
 
@@ -421,13 +430,13 @@ export const AnalyticsPage: React.FC = () => {
           type="button"
           onClick={() => setActiveTab("EXECUTIVE")}
           className={clsx(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
+            "flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-bold transition-all cursor-pointer",
             activeTab === "EXECUTIVE"
-              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              ? "bg-blue-600 text-white shadow-glowBlue border border-blue-500"
               : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <Sparkles className="w-4 h-4 text-amber-400" />
           <span>Executive Action Plan</span>
         </button>
       </div>
@@ -435,14 +444,14 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION A: Fleet Overview (Charts 25 & 26) */}
       {(activeTab === "ALL" || activeTab === "FLEET") && (
         <div className="space-y-4">
-          <div className="border-b border-[#1F2E47] pb-2">
+          <div className="border-b border-slate-800 pb-2">
             <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
               <Activity className="w-4 h-4 text-emerald-400" />
               <span>Section A — Fleet Health Trend & Condition Distribution</span>
             </h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <FleetHealthTrendChart height={180} />
+            <FleetHealthTrendChart height={220} />
             <FleetHealthChart vehicles={vehicles} />
           </div>
         </div>
@@ -451,7 +460,7 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION B: Vehicle Intelligence & Metrics (Charts 27, 28, 29) */}
       {(activeTab === "ALL" || activeTab === "VEHICLES") && (
         <div className="space-y-4">
-          <div className="border-b border-[#1F2E47] pb-2">
+          <div className="border-b border-slate-800 pb-2">
             <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
               <Truck className="w-4 h-4 text-blue-400" />
               <span>Section B — Asset Metric Comparison & Vehicle Risk Matrix</span>
@@ -463,7 +472,7 @@ export const AnalyticsPage: React.FC = () => {
               telemetryMap={telemetryMap}
               onSelectVehicle={(id) => setSelectedVehicleId(id)}
               selectedVehicleId={activeVehicleId}
-              height={170}
+              height={190}
             />
             <VehicleRiskMatrix
               vehicles={vehicles}
@@ -478,7 +487,7 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION C: Predictive Maintenance & Anomalies (Charts 30, 31, 32) */}
       {(activeTab === "ALL" || activeTab === "MAINTENANCE") && (
         <div className="space-y-4">
-          <div className="border-b border-[#1F2E47] pb-2">
+          <div className="border-b border-slate-800 pb-2">
             <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
               <Wrench className="w-4 h-4 text-amber-400" />
               <span>Section C — Predictive Maintenance Risk, RUL Ranking & Subsystem Anomalies</span>
@@ -500,7 +509,7 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION D: Driver Intelligence & Safety (Charts 33, 34) */}
       {(activeTab === "ALL" || activeTab === "DRIVERS") && (
         <div className="space-y-4">
-          <div className="border-b border-[#1F2E47] pb-2">
+          <div className="border-b border-slate-800 pb-2">
             <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
               <Users className="w-4 h-4 text-emerald-400" />
               <span>Section D — Driver Safety Leaderboard & Behavioral Infraction Matrix</span>
@@ -509,7 +518,7 @@ export const AnalyticsPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <DriverSafetyRankingChart
               drivers={drivers}
-              height={180}
+              height={200}
             />
             <DriverSafetyMatrix
               drivers={drivers}
@@ -522,7 +531,7 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION E: Incident Analytics & Triage (Charts 35, 36, 37) */}
       {(activeTab === "ALL" || activeTab === "ALERTS") && (
         <div className="space-y-4">
-          <div className="border-b border-[#1F2E47] pb-2">
+          <div className="border-b border-slate-800 pb-2">
             <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-rose-400" />
               <span>Section E — Incident Volume Trend, Severity & Category Distributions</span>
@@ -531,7 +540,7 @@ export const AnalyticsPage: React.FC = () => {
           <div>
             <AlertVolumeTrendChart
               alerts={alerts}
-              height={180}
+              height={200}
             />
           </div>
         </div>
@@ -540,7 +549,7 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION F: Live Telematics Time-Series (Charts 38–43) */}
       {(activeTab === "ALL" || activeTab === "TELEMETRY") && (
         <div className="space-y-4">
-          <div className="border-b border-[#1F2E47] pb-2">
+          <div className="border-b border-slate-800 pb-2">
             <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
               <Activity className="w-4 h-4 text-purple-400" />
               <span>Section F — Multi-Sensor Powertrain Telematics Time-Series (Speed, Temp, Oil, RPM, Battery, Fuel)</span>
@@ -561,7 +570,7 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION G: Executive Action Plan */}
       {(activeTab === "ALL" || activeTab === "EXECUTIVE") && (
         <div className="space-y-4">
-          <div className="border-b border-[#1F2E47] pb-2">
+          <div className="border-b border-slate-800 pb-2">
             <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-amber-400" />
               <span>Section G — Executive Operations Recommendations & AI Dispatch Action Plan</span>
