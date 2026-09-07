@@ -114,15 +114,15 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
 
   return (
     <Card
-      className={clsx("flex flex-col select-none shadow-card", className)}
+      className={clsx("flex flex-col select-none shadow-card bg-[#111C2D] border border-[#1F2E47]", className)}
       header={
         <div className="flex items-center gap-2">
-          <Navigation className="w-4 h-4 text-blue-600" />
-          <span className="font-semibold text-sm text-slate-900 font-sans">Mission Setup & Parameters</span>
+          <Navigation className="w-4 h-4 text-cyan-400" />
+          <span className="font-semibold text-sm text-white font-sans">Mission Setup & Parameters</span>
         </div>
       }
       headerAction={
-        <Button size="sm" variant="ghost" onClick={onReset} leftIcon={<RotateCcw className="w-3.5 h-3.5" />}>
+        <Button size="sm" variant="ghost" onClick={onReset} leftIcon={<RotateCcw className="w-3.5 h-3.5 text-slate-400" />}>
           Reset
         </Button>
       }
@@ -130,28 +130,28 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
     >
       {/* Preset Mission Profiles Selector */}
       <div className="space-y-1.5">
-        <label className="text-[10px] font-sans uppercase text-slate-500 font-semibold block">
+        <label className="text-[10px] font-sans uppercase text-slate-400 font-semibold block font-mono tracking-wider">
           Mission Presets
         </label>
         <div className="grid grid-cols-3 gap-2 font-sans text-xs">
           <button
             type="button"
             onClick={() => onLoadPreset("sf_downtown")}
-            className="px-2.5 py-2 rounded-lg bg-slate-50 border border-slate-200 hover:border-blue-500/50 text-slate-700 hover:text-slate-900 text-xs font-medium transition-colors text-center truncate shadow-sm"
+            className="px-2.5 py-2 rounded-lg bg-[#0B0F19] border border-[#1F2E47] hover:border-cyan-500/50 text-slate-300 hover:text-white hover:bg-[#16253B] text-xs font-medium transition-colors text-center truncate shadow-sm"
           >
             SF Loop (4)
           </button>
           <button
             type="button"
             onClick={() => onLoadPreset("east_bay")}
-            className="px-2.5 py-2 rounded-lg bg-slate-50 border border-slate-200 hover:border-blue-500/50 text-slate-700 hover:text-slate-900 text-xs font-medium transition-colors text-center truncate shadow-sm"
+            className="px-2.5 py-2 rounded-lg bg-[#0B0F19] border border-[#1F2E47] hover:border-cyan-500/50 text-slate-300 hover:text-white hover:bg-[#16253B] text-xs font-medium transition-colors text-center truncate shadow-sm"
           >
             East Bay (5)
           </button>
           <button
             type="button"
             onClick={() => onLoadPreset("silicon_valley")}
-            className="px-2.5 py-2 rounded-lg bg-slate-50 border border-slate-200 hover:border-blue-500/50 text-slate-700 hover:text-slate-900 text-xs font-medium transition-colors text-center truncate shadow-sm"
+            className="px-2.5 py-2 rounded-lg bg-[#0B0F19] border border-[#1F2E47] hover:border-cyan-500/50 text-slate-300 hover:text-white hover:bg-[#16253B] text-xs font-medium transition-colors text-center truncate shadow-sm"
           >
             Silicon Valley (6)
           </button>
@@ -160,7 +160,7 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
 
       {/* Mission Title */}
       <div className="space-y-1">
-        <label className="text-[10px] font-sans uppercase text-slate-500 font-semibold block">
+        <label className="text-[10px] font-sans uppercase text-slate-400 font-semibold block font-mono tracking-wider">
           Mission Title
         </label>
         <input
@@ -168,25 +168,25 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
           value={missionName}
           onChange={(e) => setMissionName(e.target.value)}
           placeholder="e.g. SF Logistics Delivery Express"
-          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-sans focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+          className="w-full px-3 py-2 bg-[#0B0F19] border border-[#1F2E47] rounded-lg text-white placeholder:text-slate-500 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
         />
       </div>
 
       {/* Asset & Driver Pairings */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         <div className="space-y-1">
-          <label className="text-[10px] font-sans uppercase text-slate-500 font-semibold flex items-center gap-1">
-            <Truck className="w-3.5 h-3.5 text-blue-600" />
+          <label className="text-[10px] font-sans uppercase text-slate-400 font-semibold flex items-center gap-1 font-mono tracking-wider">
+            <Truck className="w-3.5 h-3.5 text-cyan-400" />
             <span>Assigned Asset</span>
           </label>
           <select
             value={selectedVehicleId || ""}
             onChange={(e) => setSelectedVehicleId(e.target.value || null)}
-            className="w-full px-2.5 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-sans focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+            className="w-full px-2.5 py-2 bg-[#0B0F19] border border-[#1F2E47] rounded-lg text-slate-200 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 cursor-pointer"
           >
-            <option value="">-- Select Asset --</option>
+            <option value="" className="bg-[#0B0F19] text-slate-400">-- Select Asset --</option>
             {vehicles.map((v) => (
-              <option key={v.id} value={v.id}>
+              <option key={v.id} value={v.id} className="bg-[#0B0F19] text-white">
                 {v.name} ({v.license_plate})
               </option>
             ))}
@@ -194,11 +194,11 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
         </div>
 
         <div className="space-y-1">
-          <label className="text-[10px] font-sans uppercase text-slate-500 font-semibold flex items-center gap-1">
-            <User className="w-3.5 h-3.5 text-emerald-600" />
+          <label className="text-[10px] font-sans uppercase text-slate-400 font-semibold flex items-center gap-1 font-mono tracking-wider">
+            <User className="w-3.5 h-3.5 text-emerald-400" />
             <span>Driver Context</span>
           </label>
-          <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 text-xs font-sans truncate">
+          <div className="px-3 py-2 bg-[#0B0F19] border border-[#1F2E47] rounded-lg text-slate-300 text-xs font-mono truncate">
             {assignedDriver ? assignedDriver.name : "Unassigned"}
           </div>
         </div>
@@ -206,8 +206,8 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
 
       {/* Optimization Objective Selector */}
       <div className="space-y-1.5">
-        <label className="text-[10px] font-sans uppercase text-slate-500 font-semibold flex items-center gap-1">
-          <Compass className="w-3.5 h-3.5 text-blue-600" />
+        <label className="text-[10px] font-sans uppercase text-slate-400 font-semibold flex items-center gap-1 font-mono tracking-wider">
+          <Compass className="w-3.5 h-3.5 text-cyan-400" />
           <span>Optimization Objective</span>
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 font-sans text-xs">
@@ -217,10 +217,10 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
               type="button"
               onClick={() => setOptimizationGoal(goal)}
               className={clsx(
-                "px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-colors text-center",
+                "px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all text-center font-mono",
                 optimizationGoal === goal
-                  ? "bg-blue-50 border-blue-600 text-blue-700 shadow-sm"
-                  : "bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                  ? "bg-cyan-950/60 border-cyan-500 text-cyan-300 shadow-glowCyan font-bold"
+                  : "bg-[#0B0F19] border-[#1F2E47] text-slate-400 hover:text-white hover:bg-[#16253B] hover:border-[#2A3F5F]"
               )}
             >
               {goal}
@@ -230,11 +230,11 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
       </div>
 
       {/* Origin / Depot Configuration */}
-      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5 font-sans text-xs">
+      <div className="p-3.5 rounded-xl bg-[#0B0F19] border border-[#1F2E47] space-y-2.5 font-sans text-xs">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span className="font-semibold text-slate-900 text-xs">Origin Depot</span>
+            <span className="font-semibold text-white text-xs font-sans">Origin Depot</span>
           </div>
           <Badge variant="success" size="sm">
             START
@@ -245,40 +245,40 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
           value={origin.name}
           onChange={(e) => setOrigin({ ...origin, name: e.target.value })}
           placeholder="Depot Name"
-          className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          className="w-full px-2.5 py-1.5 bg-[#111C2D] border border-[#1F2E47] rounded-lg text-white placeholder:text-slate-500 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
         />
         <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
           <div>
-            <label className="text-[10px] text-slate-500 uppercase font-sans font-semibold">Latitude</label>
+            <label className="text-[10px] text-slate-400 uppercase font-sans font-semibold">Latitude</label>
             <input
               type="number"
               step="0.0001"
               value={origin.latitude}
               onChange={(e) => setOrigin({ ...origin, latitude: parseFloat(e.target.value) || 0 })}
-              className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 text-xs font-mono mt-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full px-2.5 py-1.5 bg-[#111C2D] border border-[#1F2E47] rounded-lg text-white text-xs font-mono mt-0.5 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
             />
           </div>
           <div>
-            <label className="text-[10px] text-slate-500 uppercase font-sans font-semibold">Longitude</label>
+            <label className="text-[10px] text-slate-400 uppercase font-sans font-semibold">Longitude</label>
             <input
               type="number"
               step="0.0001"
               value={origin.longitude}
               onChange={(e) => setOrigin({ ...origin, longitude: parseFloat(e.target.value) || 0 })}
-              className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 text-xs font-mono mt-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full px-2.5 py-1.5 bg-[#111C2D] border border-[#1F2E47] rounded-lg text-white text-xs font-mono mt-0.5 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
             />
           </div>
         </div>
       </div>
 
       {/* Destination / Round Trip Option */}
-      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5 font-sans text-xs">
+      <div className="p-3.5 rounded-xl bg-[#0B0F19] border border-[#1F2E47] space-y-2.5 font-sans text-xs">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
-            <span className="font-semibold text-slate-900 text-xs">Destination</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+            <span className="font-semibold text-white text-xs font-sans">Destination</span>
           </div>
-          <label className="flex items-center gap-1.5 text-xs text-slate-600 cursor-pointer font-medium">
+          <label className="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer font-medium font-sans">
             <input
               type="checkbox"
               checked={isRoundTrip}
@@ -292,7 +292,7 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
                   });
                 }
               }}
-              className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              className="rounded border-[#1F2E47] bg-[#111C2D] text-cyan-500 focus:ring-cyan-500 accent-cyan-500"
             />
             <span>Round Trip to Depot</span>
           </label>
@@ -311,11 +311,11 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
                 )
               }
               placeholder="Final Destination Name"
-              className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full px-2.5 py-1.5 bg-[#111C2D] border border-[#1F2E47] rounded-lg text-white placeholder:text-slate-500 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
             />
             <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
               <div>
-                <label className="text-[10px] text-slate-500 uppercase font-sans font-semibold">Latitude</label>
+                <label className="text-[10px] text-slate-400 uppercase font-sans font-semibold">Latitude</label>
                 <input
                   type="number"
                   step="0.0001"
@@ -327,11 +327,11 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
                         : { name: "Destination", latitude: parseFloat(e.target.value) || 0, longitude: origin.longitude }
                     )
                   }
-                  className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 text-xs font-mono mt-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-2.5 py-1.5 bg-[#111C2D] border border-[#1F2E47] rounded-lg text-white text-xs font-mono mt-0.5 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
                 />
               </div>
               <div>
-                <label className="text-[10px] text-slate-500 uppercase font-sans font-semibold">Longitude</label>
+                <label className="text-[10px] text-slate-400 uppercase font-sans font-semibold">Longitude</label>
                 <input
                   type="number"
                   step="0.0001"
@@ -343,7 +343,7 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
                         : { name: "Destination", latitude: origin.latitude, longitude: parseFloat(e.target.value) || 0 }
                     )
                   }
-                  className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 text-xs font-mono mt-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-2.5 py-1.5 bg-[#111C2D] border border-[#1F2E47] rounded-lg text-white text-xs font-mono mt-0.5 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500"
                 />
               </div>
             </div>
@@ -354,10 +354,10 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
       {/* Waypoints Stops List */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-sans uppercase text-slate-500 font-semibold">
+          <span className="text-[10px] font-sans uppercase text-slate-400 font-semibold font-mono tracking-wider">
             Delivery Stops ({stops.length})
           </span>
-          <Button size="sm" variant="secondary" onClick={handleAddStop} leftIcon={<Plus className="w-3 h-3" />}>
+          <Button size="sm" variant="secondary" onClick={handleAddStop} leftIcon={<Plus className="w-3 h-3 text-cyan-400" />}>
             Add Stop
           </Button>
         </div>
@@ -379,17 +379,17 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
       </div>
 
       {/* Save to Database Option */}
-      <div className="pt-3 border-t border-slate-200 flex items-center justify-between font-sans text-xs">
-        <label className="flex items-center gap-2 cursor-pointer text-slate-700 text-xs font-medium">
+      <div className="pt-3 border-t border-[#1F2E47] flex items-center justify-between font-sans text-xs">
+        <label className="flex items-center gap-2 cursor-pointer text-slate-300 text-xs font-medium font-sans">
           <input
             type="checkbox"
             checked={saveToDatabase}
             onChange={(e) => setSaveToDatabase(e.target.checked)}
-            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+            className="rounded border-[#1F2E47] bg-[#111C2D] text-cyan-500 focus:ring-cyan-500 accent-cyan-500"
           />
           <span>Persist to Database History</span>
         </label>
-        <Database className="w-3.5 h-3.5 text-slate-400" />
+        <Database className="w-3.5 h-3.5 text-cyan-400" />
       </div>
 
       {/* Action Button: Optimize Route */}
@@ -400,7 +400,7 @@ export const MissionConfigPanel: React.FC<MissionConfigPanelProps> = ({
         disabled={isOptimizing}
         isLoading={isOptimizing}
         leftIcon={<Sparkles className="w-4 h-4 text-white" />}
-        className="w-full font-bold shadow-md"
+        className="w-full font-bold shadow-glowBlue bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white"
       >
         {isOptimizing ? "Computing 2-Opt TSP Sequence..." : "Optimize Mission Route"}
       </Button>

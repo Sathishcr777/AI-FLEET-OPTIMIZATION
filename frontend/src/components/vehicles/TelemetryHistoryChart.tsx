@@ -364,6 +364,7 @@ export const TelemetryHistoryChart: React.FC<TelemetryHistoryChartProps> = ({
                   strokeWidth={2}
                   fillOpacity={1}
                   fill={`url(#${config.gradientId})`}
+                  dot={chartData.length <= 2 ? { r: 3, fill: config.color } : false}
                   isAnimationActive={false}
                 />
               </AreaChart>

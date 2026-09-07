@@ -64,10 +64,12 @@ export const SavedRoutesDrawer: React.FC<SavedRoutesDrawerProps> = ({
             onRetry={() => refetch()}
           />
         ) : routes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-8 text-center rounded-xl bg-slate-50 border border-slate-200">
-            <Route className="w-8 h-8 text-slate-400 mb-2" />
-            <h4 className="font-semibold text-slate-900 text-xs">No Saved Routes Found</h4>
-            <p className="text-xs text-slate-500 mt-1 max-w-xs font-sans">
+          <div className="flex flex-col items-center justify-center p-8 text-center rounded-xl bg-[#0B0F19] border border-[#1F2E47]">
+            <div className="p-3 rounded-2xl bg-[#16253B] border border-[#1F2E47] text-cyan-400 mb-2.5 shadow-inner">
+              <Route className="w-7 h-7" />
+            </div>
+            <h4 className="font-semibold text-white text-xs uppercase font-mono tracking-wider">No Saved Routes Found</h4>
+            <p className="text-xs text-slate-400 mt-1 max-w-xs font-sans leading-relaxed">
               When optimizing a route, check &quot;Persist to Database History&quot; to save missions for future dispatch reload.
             </p>
           </div>
@@ -76,13 +78,13 @@ export const SavedRoutesDrawer: React.FC<SavedRoutesDrawerProps> = ({
             {routes.map((r) => (
               <div
                 key={r.id}
-                className="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-slate-300 transition-colors space-y-2.5 shadow-sm"
+                className="p-4 rounded-xl bg-[#0B0F19] border border-[#1F2E47] hover:border-[#2A3F5F] transition-colors space-y-2.5 shadow-sm"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h4 className="font-semibold text-slate-900 text-xs font-sans">{r.name}</h4>
-                    <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
-                      <Calendar className="w-3 h-3 text-slate-400" />
+                    <h4 className="font-semibold text-white text-xs font-sans">{r.name}</h4>
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mt-0.5 font-mono">
+                      <Calendar className="w-3 h-3 text-slate-500" />
                       <span>{new Date(r.created_at).toLocaleString()}</span>
                     </div>
                   </div>
@@ -91,14 +93,14 @@ export const SavedRoutesDrawer: React.FC<SavedRoutesDrawerProps> = ({
                   </Badge>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-white border border-slate-200 text-xs font-mono">
+                <div className="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-[#111C2D] border border-[#1F2E47] text-xs font-mono">
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase font-sans font-semibold">Optimized Distance</span>
-                    <div className="font-bold text-emerald-700">{r.optimized_distance_km.toFixed(1)} km</div>
+                    <span className="text-[10px] text-slate-400 uppercase font-sans font-semibold">Optimized Distance</span>
+                    <div className="font-bold text-emerald-400">{r.optimized_distance_km.toFixed(1)} km</div>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase font-sans font-semibold">Est. Travel Time</span>
-                    <div className="font-bold text-blue-700">{r.optimized_time_min} min</div>
+                    <span className="text-[10px] text-slate-400 uppercase font-sans font-semibold">Est. Travel Time</span>
+                    <div className="font-bold text-blue-400">{r.optimized_time_min} min</div>
                   </div>
                 </div>
 
@@ -113,7 +115,7 @@ export const SavedRoutesDrawer: React.FC<SavedRoutesDrawerProps> = ({
                       variant="ghost"
                       onClick={() => deleteMutation.mutate(r.id)}
                       disabled={deleteMutation.isPending}
-                      className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-2"
+                      className="text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 px-2"
                       title="Delete Route"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -126,6 +128,7 @@ export const SavedRoutesDrawer: React.FC<SavedRoutesDrawerProps> = ({
                         onOpenChange(false);
                       }}
                       rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+                      className="bg-blue-600 hover:bg-blue-500 text-white font-bold"
                     >
                       Load Route
                     </Button>

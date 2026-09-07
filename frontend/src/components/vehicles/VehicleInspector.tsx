@@ -75,22 +75,21 @@ export const VehicleInspector: React.FC<VehicleInspectorProps> = ({
     staleTime: 60000,
   });
 
-  // Merge REST historical records with live Zustand packets
+  // Merge REST historical records with live Zustand packets stably
   const combinedHistory = React.useMemo(() => {
-    if (liveHistory.length >= 10) return liveHistory;
     const restRecords = initialHistoryData?.records || [];
-    if (restRecords.length === 0) return liveHistory;
-
-    // Combine and deduplicate
-    const map = new Map<string, typeof liveTelemetry>();
+    const map = new Map<string, any>();
     for (const r of restRecords) {
-      if (r.time) map.set(r.time, r);
+      if (r && r.time) map.set(r.time, r);
     }
     for (const r of liveHistory) {
-      if (r.time) map.set(r.time, r);
+      if (r && r.time) map.set(r.time, r);
+    }
+    if (map.size === 0 && liveTelemetry && liveTelemetry.time) {
+      map.set(liveTelemetry.time, liveTelemetry);
     }
     return Array.from(map.values()).sort(
-      (a, b) => new Date(a?.time || 0).getTime() - new Date(b?.time || 0).getTime()
+      (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()
     );
   }, [liveHistory, initialHistoryData, liveTelemetry]);
 
@@ -155,8 +154,20 @@ export const VehicleInspector: React.FC<VehicleInspectorProps> = ({
 
       {/* 2. Powertrain Health & Predictive Maintenance Cards Side-by-Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <VehicleHealthCard health={healthData} isLoading={isLoadingHealth} />
-        <PredictiveMaintenanceCard prediction={maintenanceData} isLoading={isLoadingMaintenance} />
+        <VehicleHealthCard
+          health={healthData}
+          telemetry={liveTelemetry}
+          history={combinedHistory}
+          vehicle={vehicle}
+          isLoading={isLoadingHealth}
+        />
+        <PredictiveMaintenanceCard
+          prediction={maintenanceData}
+          telemetry={liveTelemetry}
+          history={combinedHistory}
+          vehicle={vehicle}
+          isLoading={isLoadingMaintenance}
+        />
       </div>
 
       {/* 3. Powertrain Time-Series Telemetry Charts */}

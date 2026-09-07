@@ -69,11 +69,11 @@ export const AlertQueue: React.FC<AlertQueueProps> = ({
 
   return (
     <Card
-      className={clsx("flex flex-col h-full select-none shadow-card", className)}
+      className={clsx("flex flex-col h-full select-none shadow-card bg-[#111C2D] border border-[#1F2E47]", className)}
       header={
         <div className="flex items-center gap-2">
-          <Bell className="w-4 h-4 text-blue-600" />
-          <span className="font-semibold text-slate-900 font-sans">Incident Queue ({alerts.length})</span>
+          <Bell className="w-4 h-4 text-blue-400" />
+          <span className="font-semibold text-white font-sans">Incident Queue ({alerts.length})</span>
         </div>
       }
       headerAction={
@@ -82,11 +82,11 @@ export const AlertQueue: React.FC<AlertQueueProps> = ({
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as "newest" | "oldest" | "severity")}
-            className="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+            className="px-2.5 py-1 bg-[#0B0F19] border border-[#1F2E47] rounded-lg text-slate-300 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="newest">Newest First</option>
-            <option value="severity">Highest Severity</option>
-            <option value="oldest">Oldest First</option>
+            <option value="newest" className="bg-[#0B0F19] text-white">Newest First</option>
+            <option value="severity" className="bg-[#0B0F19] text-white">Highest Severity</option>
+            <option value="oldest" className="bg-[#0B0F19] text-white">Oldest First</option>
           </select>
         </div>
       }
@@ -100,10 +100,12 @@ export const AlertQueue: React.FC<AlertQueueProps> = ({
             <Skeleton className="h-20 w-full rounded-xl" />
           </div>
         ) : sortedAlerts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-8 text-center rounded-xl bg-slate-50 border border-slate-200">
-            <ShieldCheck className="w-8 h-8 text-emerald-600 mb-2" />
-            <h4 className="text-xs font-semibold text-slate-900 font-sans">No Incidents in Queue</h4>
-            <p className="text-xs text-slate-500 mt-1 max-w-xs font-sans">
+          <div className="flex flex-col items-center justify-center p-8 text-center rounded-xl bg-[#0B0F19] border border-[#1F2E47]">
+            <div className="p-3 rounded-2xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 mb-2">
+              <ShieldCheck className="w-7 h-7" />
+            </div>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider font-mono">No Incidents in Queue</h4>
+            <p className="text-xs text-slate-400 mt-1 max-w-xs font-sans">
               All active alerts have been resolved or filtered out by your current criteria.
             </p>
           </div>

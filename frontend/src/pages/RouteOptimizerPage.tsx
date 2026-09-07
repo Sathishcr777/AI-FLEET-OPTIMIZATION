@@ -241,16 +241,16 @@ export const RouteOptimizerPage: React.FC = () => {
   return (
     <div className="w-full max-w-[1920px] mx-auto space-y-6 pb-12">
       {/* Workstation Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/90 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1F2E47] pb-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5 font-sans">
-            <RouteIcon className="w-6 h-6 text-blue-600" />
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5 font-sans">
+            <RouteIcon className="w-6 h-6 text-cyan-400" />
             <span>Mission Dispatch & Route Optimizer</span>
             <Badge variant="brand" size="sm">
               2-OPT TSP
             </Badge>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5 font-sans">
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-sans">
             Algorithmic traveling salesperson optimization, comparative savings analysis, and dispatch routing.
           </p>
         </div>
@@ -260,7 +260,7 @@ export const RouteOptimizerPage: React.FC = () => {
             size="md"
             variant="secondary"
             onClick={() => setSavedRoutesDrawerOpen(true)}
-            leftIcon={<Bookmark className="w-4 h-4 text-blue-600" />}
+            leftIcon={<Bookmark className="w-4 h-4 text-cyan-400" />}
           >
             Saved Missions
           </Button>
@@ -269,7 +269,7 @@ export const RouteOptimizerPage: React.FC = () => {
             size="md"
             variant="secondary"
             onClick={() => setScenarioDrawerOpen(true)}
-            leftIcon={<Zap className="w-4 h-4 text-amber-500" />}
+            leftIcon={<Zap className="w-4 h-4 text-amber-400" />}
           >
             Scenario Cockpit
           </Button>
@@ -278,8 +278,8 @@ export const RouteOptimizerPage: React.FC = () => {
 
       {/* Validation Error Banner */}
       {validationError && (
-        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 flex items-center gap-2.5 text-xs sm:text-sm font-sans text-rose-700">
-          <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+        <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/40 flex items-center gap-2.5 text-xs sm:text-sm font-sans text-rose-300 shadow-glow-crimson">
+          <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
           <span>{validationError}</span>
         </div>
       )}

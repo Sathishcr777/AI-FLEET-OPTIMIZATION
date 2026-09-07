@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { vehiclesApi } from "../api/vehicles";
 import { driversApi } from "../api/drivers";
@@ -183,6 +183,30 @@ export const AnalyticsPage: React.FC = () => {
     };
   }, [vehicles, drivers, alerts, predictionsMap, anomalies]);
 
+  const recordFleetSnapshot = useTelemetryStore((s) => s.recordFleetSnapshot);
+
+  // Periodic Telemetry Snapshot Record into Zustand
+  useEffect(() => {
+    if (vehicles.length > 0) {
+      const nominalCount = vehicles.filter(
+        (v) => v.health_status === "GOOD"
+      ).length;
+      const degradedCount = vehicles.filter(
+        (v) => v.health_status === "WARNING"
+      ).length;
+      const criticalCount = vehicles.filter((v) => v.health_status === "CRITICAL").length;
+
+      recordFleetSnapshot({
+        avgHealth: kpiData.avgFleetHealth,
+        activeAlerts: kpiData.criticalAlerts,
+        activeVehicles: kpiData.activeVehicles,
+        nominalCount,
+        degradedCount,
+        criticalCount,
+      });
+    }
+  }, [kpiData, vehicles, recordFleetSnapshot]);
+
   const handleRefreshAll = () => {
     queryClient.invalidateQueries({ queryKey: ["vehicles"] });
     queryClient.invalidateQueries({ queryKey: ["drivers"] });
@@ -224,16 +248,16 @@ export const AnalyticsPage: React.FC = () => {
   return (
     <div className="w-full max-w-[1920px] mx-auto space-y-6 pb-12">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/90 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1F2E47] pb-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5 font-sans">
-            <BarChart3 className="w-6 h-6 text-blue-600" />
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5 font-sans">
+            <BarChart3 className="w-6 h-6 text-blue-400" />
             <span>Fleet Analytics & Executive Intelligence</span>
             <Badge variant="brand" size="sm">
               AI / ML METRICS
             </Badge>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5 font-sans">
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-sans">
             Fleet health distribution, predictive maintenance risk, driver safety analytics, and telematics anomaly trends.
           </p>
         </div>
@@ -249,8 +273,8 @@ export const AnalyticsPage: React.FC = () => {
           />
 
           {/* Data Freshness Indicator */}
-          <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 shadow-subtle">
-            <Radio className="w-4 h-4 text-emerald-600 animate-pulse" />
+          <div className="flex items-center gap-2 px-3 py-2 bg-[#111C2D] border border-[#1F2E47] rounded-xl text-slate-300 shadow-card">
+            <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
             <span className="text-xs font-mono font-medium">
               Synced {lastRefreshed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
             </span>
@@ -262,7 +286,7 @@ export const AnalyticsPage: React.FC = () => {
             <select
               value={sampleLimit}
               onChange={(e) => setSampleLimit(Number(e.target.value))}
-              className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs sm:text-sm font-mono font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 shadow-subtle"
+              className="px-3 py-2 bg-[#0B0F19] border border-[#1F2E47] rounded-xl text-slate-100 text-xs sm:text-sm font-mono font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 shadow-card cursor-pointer"
             >
               <option value={50}>50 Pkts</option>
               <option value={100}>100 Pkts</option>
@@ -275,7 +299,7 @@ export const AnalyticsPage: React.FC = () => {
             size="md"
             variant="secondary"
             onClick={handleRefreshAll}
-            leftIcon={<RotateCcw className="w-4 h-4" />}
+            leftIcon={<RotateCcw className="w-4 h-4 text-slate-300" />}
           >
             Refresh
           </Button>
@@ -294,18 +318,18 @@ export const AnalyticsPage: React.FC = () => {
       />
 
       {/* 2. Structured Section Tab Navigator */}
-      <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200 text-xs sm:text-[13px] font-sans">
+      <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-[#111C2D] rounded-2xl border border-[#1F2E47] text-xs sm:text-[13px] font-sans shadow-card">
         <button
           type="button"
           onClick={() => setActiveTab("ALL")}
           className={clsx(
             "flex items-center gap-2 px-3.5 py-2 rounded-xl font-semibold transition-all cursor-pointer",
             activeTab === "ALL"
-              ? "bg-white text-slate-900 shadow-sm border border-slate-200/80 font-bold"
-              : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
+              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Layers className="w-4 h-4 text-blue-600" />
+          <Layers className="w-4 h-4 text-cyan-400" />
           <span>All Analytics</span>
         </button>
 
@@ -315,11 +339,11 @@ export const AnalyticsPage: React.FC = () => {
           className={clsx(
             "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
             activeTab === "FLEET"
-              ? "bg-white text-slate-900 shadow-sm border border-slate-200/80 font-bold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-white/50"
+              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Activity className="w-3.5 h-3.5 text-emerald-600" />
+          <Activity className="w-3.5 h-3.5 text-emerald-400" />
           <span>Fleet Health (Ch 25-26)</span>
         </button>
 
@@ -329,11 +353,11 @@ export const AnalyticsPage: React.FC = () => {
           className={clsx(
             "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
             activeTab === "VEHICLES"
-              ? "bg-white text-slate-900 shadow-sm border border-slate-200/80 font-bold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-white/50"
+              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Truck className="w-3.5 h-3.5 text-blue-600" />
+          <Truck className="w-3.5 h-3.5 text-blue-400" />
           <span>Vehicle Intel (Ch 27-29)</span>
         </button>
 
@@ -343,11 +367,11 @@ export const AnalyticsPage: React.FC = () => {
           className={clsx(
             "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
             activeTab === "MAINTENANCE"
-              ? "bg-white text-slate-900 shadow-sm border border-slate-200/80 font-bold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-white/50"
+              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Wrench className="w-3.5 h-3.5 text-amber-500" />
+          <Wrench className="w-3.5 h-3.5 text-amber-400" />
           <span>Predictive Maint (Ch 30-32)</span>
         </button>
 
@@ -357,11 +381,11 @@ export const AnalyticsPage: React.FC = () => {
           className={clsx(
             "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
             activeTab === "DRIVERS"
-              ? "bg-white text-slate-900 shadow-sm border border-slate-200/80 font-bold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-white/50"
+              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Users className="w-3.5 h-3.5 text-emerald-600" />
+          <Users className="w-3.5 h-3.5 text-emerald-400" />
           <span>Driver Safety (Ch 33-34)</span>
         </button>
 
@@ -371,11 +395,11 @@ export const AnalyticsPage: React.FC = () => {
           className={clsx(
             "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
             activeTab === "ALERTS"
-              ? "bg-white text-slate-900 shadow-sm border border-slate-200/80 font-bold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-white/50"
+              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
+          <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
           <span>Incident Triage (Ch 35-37)</span>
         </button>
 
@@ -385,11 +409,11 @@ export const AnalyticsPage: React.FC = () => {
           className={clsx(
             "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
             activeTab === "TELEMETRY"
-              ? "bg-white text-slate-900 shadow-sm border border-slate-200/80 font-bold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-white/50"
+              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Activity className="w-3.5 h-3.5 text-purple-600" />
+          <Activity className="w-3.5 h-3.5 text-purple-400" />
           <span>Live Telematics (Ch 38-43)</span>
         </button>
 
@@ -399,11 +423,11 @@ export const AnalyticsPage: React.FC = () => {
           className={clsx(
             "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
             activeTab === "EXECUTIVE"
-              ? "bg-white text-slate-900 shadow-sm border border-slate-200/80 font-bold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-white/50"
+              ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500"
+              : "text-slate-400 hover:text-white hover:bg-[#16253B]"
           )}
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
           <span>Executive Action Plan</span>
         </button>
       </div>
@@ -411,9 +435,9 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION A: Fleet Overview (Charts 25 & 26) */}
       {(activeTab === "ALL" || activeTab === "FLEET") && (
         <div className="space-y-4">
-          <div className="border-b border-slate-200 pb-2">
-            <h2 className="text-sm font-bold text-slate-800 font-sans flex items-center gap-2">
-              <Activity className="w-4 h-4 text-emerald-600" />
+          <div className="border-b border-[#1F2E47] pb-2">
+            <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
+              <Activity className="w-4 h-4 text-emerald-400" />
               <span>Section A — Fleet Health Trend & Condition Distribution</span>
             </h2>
           </div>
@@ -427,9 +451,9 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION B: Vehicle Intelligence & Metrics (Charts 27, 28, 29) */}
       {(activeTab === "ALL" || activeTab === "VEHICLES") && (
         <div className="space-y-4">
-          <div className="border-b border-slate-200 pb-2">
-            <h2 className="text-sm font-bold text-slate-800 font-sans flex items-center gap-2">
-              <Truck className="w-4 h-4 text-blue-600" />
+          <div className="border-b border-[#1F2E47] pb-2">
+            <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
+              <Truck className="w-4 h-4 text-blue-400" />
               <span>Section B — Asset Metric Comparison & Vehicle Risk Matrix</span>
             </h2>
           </div>
@@ -454,9 +478,9 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION C: Predictive Maintenance & Anomalies (Charts 30, 31, 32) */}
       {(activeTab === "ALL" || activeTab === "MAINTENANCE") && (
         <div className="space-y-4">
-          <div className="border-b border-slate-200 pb-2">
-            <h2 className="text-sm font-bold text-slate-800 font-sans flex items-center gap-2">
-              <Wrench className="w-4 h-4 text-amber-500" />
+          <div className="border-b border-[#1F2E47] pb-2">
+            <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
+              <Wrench className="w-4 h-4 text-amber-400" />
               <span>Section C — Predictive Maintenance Risk, RUL Ranking & Subsystem Anomalies</span>
             </h2>
           </div>
@@ -476,9 +500,9 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION D: Driver Intelligence & Safety (Charts 33, 34) */}
       {(activeTab === "ALL" || activeTab === "DRIVERS") && (
         <div className="space-y-4">
-          <div className="border-b border-slate-200 pb-2">
-            <h2 className="text-sm font-bold text-slate-800 font-sans flex items-center gap-2">
-              <Users className="w-4 h-4 text-emerald-600" />
+          <div className="border-b border-[#1F2E47] pb-2">
+            <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
+              <Users className="w-4 h-4 text-emerald-400" />
               <span>Section D — Driver Safety Leaderboard & Behavioral Infraction Matrix</span>
             </h2>
           </div>
@@ -498,9 +522,9 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION E: Incident Analytics & Triage (Charts 35, 36, 37) */}
       {(activeTab === "ALL" || activeTab === "ALERTS") && (
         <div className="space-y-4">
-          <div className="border-b border-slate-200 pb-2">
-            <h2 className="text-sm font-bold text-slate-800 font-sans flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-rose-500" />
+          <div className="border-b border-[#1F2E47] pb-2">
+            <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-rose-400" />
               <span>Section E — Incident Volume Trend, Severity & Category Distributions</span>
             </h2>
           </div>
@@ -516,9 +540,9 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION F: Live Telematics Time-Series (Charts 38–43) */}
       {(activeTab === "ALL" || activeTab === "TELEMETRY") && (
         <div className="space-y-4">
-          <div className="border-b border-slate-200 pb-2">
-            <h2 className="text-sm font-bold text-slate-800 font-sans flex items-center gap-2">
-              <Activity className="w-4 h-4 text-purple-600" />
+          <div className="border-b border-[#1F2E47] pb-2">
+            <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
+              <Activity className="w-4 h-4 text-purple-400" />
               <span>Section F — Multi-Sensor Powertrain Telematics Time-Series (Speed, Temp, Oil, RPM, Battery, Fuel)</span>
             </h2>
           </div>
@@ -537,9 +561,9 @@ export const AnalyticsPage: React.FC = () => {
       {/* SECTION G: Executive Action Plan */}
       {(activeTab === "ALL" || activeTab === "EXECUTIVE") && (
         <div className="space-y-4">
-          <div className="border-b border-slate-200 pb-2">
-            <h2 className="text-sm font-bold text-slate-800 font-sans flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-500" />
+          <div className="border-b border-[#1F2E47] pb-2">
+            <h2 className="text-sm font-bold text-slate-200 font-sans flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-400" />
               <span>Section G — Executive Operations Recommendations & AI Dispatch Action Plan</span>
             </h2>
           </div>

@@ -63,6 +63,7 @@ async def get_latest_fleet_telemetry(db: AsyncSession = Depends(get_db)):
                         engine_temp_c=cached_packet.engine_temp_c,
                         oil_pressure_psi=cached_packet.oil_pressure_psi,
                         tire_pressure_psi=cached_packet.tire_pressure_psi,
+                        battery_voltage=cached_packet.battery_voltage,
                         odometer_km=cached_packet.odometer_km,
                         is_anomaly=cached_packet.is_anomaly,
                         last_updated=cached_packet.time,
@@ -86,6 +87,7 @@ async def get_latest_fleet_telemetry(db: AsyncSession = Depends(get_db)):
                         engine_temp_c=90.0,
                         oil_pressure_psi=45.0,
                         tire_pressure_psi=34.0,
+                        battery_voltage=12.6,
                         odometer_km=v.total_mileage_km,
                         is_anomaly=False,
                         last_updated=datetime.now(timezone.utc),
@@ -114,6 +116,7 @@ async def get_latest_fleet_telemetry(db: AsyncSession = Depends(get_db)):
                         engine_temp_c=cached_packet.engine_temp_c,
                         oil_pressure_psi=cached_packet.oil_pressure_psi,
                         tire_pressure_psi=cached_packet.tire_pressure_psi,
+                        battery_voltage=cached_packet.battery_voltage,
                         odometer_km=cached_packet.odometer_km,
                         is_anomaly=cached_packet.is_anomaly,
                         last_updated=cached_packet.time,
@@ -170,6 +173,25 @@ async def get_telemetry_history(
         records = result.scalars().all()
     except Exception as exc:
         logger.debug(f"Database query failed in telemetry/history: {exc}")
+
+    # The ingestion service keeps a bounded real-time history ring buffer in memory.
+    # Use it as a fallback when PostgreSQL has not accumulated records yet (or is offline),
+    # so analytics and vehicle inspection render full time-series data while the live stream is healthy.
+    if not records:
+        mem_history = ingestion_service.get_history_for_vehicle(vehicle_id, limit)
+        if mem_history:
+            return TelemetryHistoryResponse(
+                vehicle_id=vehicle_id,
+                total_records=len(mem_history),
+                data=mem_history,
+            )
+        cached = ingestion_service.get_latest_for_vehicle(vehicle_id)
+        if cached:
+            return TelemetryHistoryResponse(
+                vehicle_id=vehicle_id,
+                total_records=1,
+                data=[cached],
+            )
 
     return TelemetryHistoryResponse(
         vehicle_id=vehicle_id,

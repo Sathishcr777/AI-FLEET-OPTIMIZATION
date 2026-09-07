@@ -9,8 +9,6 @@ import {
   AlertTriangle,
   Route,
   BarChart3,
-  ShieldCheck,
-  Radio,
   ChevronLeft,
   ChevronRight,
   Cpu,

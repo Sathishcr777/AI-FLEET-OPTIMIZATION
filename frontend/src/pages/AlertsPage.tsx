@@ -216,16 +216,16 @@ export const AlertsPage: React.FC = () => {
   return (
     <div className="w-full max-w-[1920px] mx-auto space-y-6 pb-12">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/90 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1F2E47] pb-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5 font-sans">
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5 font-sans">
             <ShieldAlert className="w-6 h-6 text-rose-500" />
             <span>Alert Center & Incident Triage</span>
             <Badge variant="critical" size="sm" dot>
               {summary.active} ACTIVE
             </Badge>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5 font-sans">
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-sans">
             Deduplicated anomaly detection, severity prioritization, telemetry investigation, and operator dispatch triage.
           </p>
         </div>

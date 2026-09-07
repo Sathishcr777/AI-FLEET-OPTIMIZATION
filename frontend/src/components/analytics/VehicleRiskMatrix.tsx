@@ -68,15 +68,15 @@ export const VehicleRiskMatrix: React.FC<VehicleRiskMatrixProps> = ({
 
   return (
     <Card
-      className={clsx("flex flex-col h-full select-none shadow-card", className)}
+      className={clsx("flex flex-col h-full select-none shadow-card bg-[#111C2D] border border-[#1F2E47]", className)}
       header={
         <div className="flex items-center gap-2">
-          <Truck className="w-4 h-4 text-blue-600" />
-          <span className="font-semibold text-slate-900 font-sans">Vehicle Operational Risk Matrix</span>
+          <Truck className="w-4 h-4 text-cyan-400" />
+          <span className="font-semibold text-white font-sans text-sm sm:text-base">Vehicle Operational Risk Matrix</span>
         </div>
       }
       headerAction={
-        <span className="text-xs text-slate-500 font-sans">
+        <span className="text-xs text-slate-400 font-sans font-mono">
           Ranked by Composite Risk Index
         </span>
       }
@@ -84,7 +84,7 @@ export const VehicleRiskMatrix: React.FC<VehicleRiskMatrixProps> = ({
       <div className="overflow-x-auto">
         <table className="w-full text-left font-sans text-xs">
           <thead>
-            <tr className="border-b border-slate-200 text-slate-500 text-[10px] uppercase font-semibold">
+            <tr className="border-b border-[#1F2E47] text-slate-400 text-[10px] uppercase font-semibold font-mono">
               <th className="pb-3 pl-3">Vehicle Asset</th>
               <th className="pb-3">Health Status</th>
               <th className="pb-3">Maint. Risk</th>
@@ -94,7 +94,7 @@ export const VehicleRiskMatrix: React.FC<VehicleRiskMatrixProps> = ({
               <th className="pb-3 pr-3 text-right">Inspect</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-[#1F2E47]">
             {rankedVehicles.map((v) => {
               const pred = predictions[v.id];
               const openAlerts = alertCountMap.get(v.id) || 0;
@@ -105,14 +105,14 @@ export const VehicleRiskMatrix: React.FC<VehicleRiskMatrixProps> = ({
                 <tr
                   key={v.id}
                   className={clsx(
-                    "hover:bg-slate-50/80 transition-colors",
-                    isCrit && "bg-rose-50/30"
+                    "hover:bg-[#16253B] transition-colors",
+                    isCrit && "bg-rose-950/20"
                   )}
                 >
                   {/* Asset */}
                   <td className="py-3 pl-3">
-                    <div className="font-semibold text-slate-900 text-xs">{v.name}</div>
-                    <div className="text-[11px] text-slate-500 font-mono">
+                    <div className="font-semibold text-slate-100 text-xs">{v.name}</div>
+                    <div className="text-[11px] text-slate-400 font-mono">
                       {v.license_plate} · {v.model}
                     </div>
                   </td>
@@ -150,38 +150,38 @@ export const VehicleRiskMatrix: React.FC<VehicleRiskMatrixProps> = ({
                   </td>
 
                   {/* Est RUL */}
-                  <td className="py-3 text-slate-700 font-mono">
+                  <td className="py-3 text-slate-300 font-mono">
                     {pred ? `${pred.estimated_rul_km.toLocaleString()} km` : "—"}
                   </td>
 
                   {/* Open Incidents */}
                   <td className="py-3">
                     {openAlerts > 0 ? (
-                      <span className="text-rose-600 font-semibold flex items-center gap-1">
-                        <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
+                      <span className="text-rose-400 font-semibold flex items-center gap-1 font-mono">
+                        <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
                         <span>{openAlerts} Active</span>
                       </span>
                     ) : (
-                      <span className="text-slate-400">0 Active</span>
+                      <span className="text-slate-500 font-mono">0 Active</span>
                     )}
                   </td>
 
                   {/* Anomalies */}
                   <td className="py-3">
                     {openAnomalies > 0 ? (
-                      <span className="text-purple-600 font-semibold flex items-center gap-1">
-                        <Flame className="w-3.5 h-3.5 text-purple-500" />
+                      <span className="text-purple-400 font-semibold flex items-center gap-1 font-mono">
+                        <Flame className="w-3.5 h-3.5 text-purple-400" />
                         <span>{openAnomalies} Outliers</span>
                       </span>
                     ) : (
-                      <span className="text-slate-400">0</span>
+                      <span className="text-slate-500 font-mono">0</span>
                     )}
                   </td>
 
                   {/* Inspect Link */}
                   <td className="py-3 pr-3 text-right">
                     <Link to={`/vehicles?id=${v.id}`}>
-                      <button className="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-slate-700 text-xs font-medium inline-flex items-center gap-1 transition-colors shadow-sm">
+                      <button className="px-2.5 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1F2E47] hover:bg-[#16253B] hover:border-slate-600 text-slate-300 hover:text-white text-xs font-medium inline-flex items-center gap-1 transition-colors shadow-card cursor-pointer">
                         <span>Inspect</span>
                         <ExternalLink className="w-3 h-3 text-slate-400" />
                       </button>

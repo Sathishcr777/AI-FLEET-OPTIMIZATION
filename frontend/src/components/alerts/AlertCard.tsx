@@ -40,17 +40,17 @@ export const AlertCard: React.FC<AlertCardProps> = ({
       className={clsx(
         "p-3.5 rounded-xl border cursor-pointer font-sans text-xs select-none transition-all duration-150 space-y-2 shadow-sm",
         isSelected
-          ? "bg-blue-50/70 border-blue-600 ring-2 ring-blue-500/20 shadow-md"
+          ? "bg-blue-950/40 border-blue-500 ring-1 ring-blue-500 shadow-glowBlue"
           : isCritical && !isResolved
-          ? "bg-rose-50/50 border-rose-200 hover:border-rose-400"
-          : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/60"
+          ? "bg-rose-950/25 border-rose-500/40 hover:border-rose-500/70 hover:bg-rose-950/35"
+          : "bg-[#0B0F19] border-[#1F2E47] hover:border-[#2A3F5F] hover:bg-[#16253B]"
       )}
     >
       {/* Header Row: Severity, Title, Status */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 truncate">
           <SeverityBadge severity={alert.severity} size="sm" />
-          <span className="font-semibold text-slate-900 text-xs truncate">{alert.title}</span>
+          <span className="font-semibold text-white text-xs truncate">{alert.title}</span>
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
@@ -71,21 +71,21 @@ export const AlertCard: React.FC<AlertCardProps> = ({
       </div>
 
       {/* Message Preview */}
-      <p className="text-slate-600 font-sans text-xs line-clamp-2 leading-relaxed">
+      <p className="text-slate-300 font-sans text-xs line-clamp-2 leading-relaxed">
         {alert.message}
       </p>
 
       {/* Footer Row: Asset Context, Driver, Time */}
-      <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+      <div className="pt-2 border-t border-[#1F2E47] flex items-center justify-between text-[11px] text-slate-400">
         <div className="flex items-center gap-2.5 truncate">
-          <span className="flex items-center gap-1 text-slate-700 truncate font-medium">
-            <Truck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-            <span className="truncate">{vehicle ? vehicle.name : alert.vehicle_id.slice(0, 8)}</span>
+          <span className="flex items-center gap-1 text-slate-200 truncate font-medium">
+            <Truck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+            <span className="truncate font-mono">{vehicle ? vehicle.name : alert.vehicle_id.slice(0, 8)}</span>
           </span>
 
           {driver && (
-            <span className="flex items-center gap-1 text-slate-500 truncate hidden sm:flex font-normal">
-              <User className="w-3 h-3 text-emerald-600 shrink-0" />
+            <span className="flex items-center gap-1 text-slate-400 truncate hidden sm:flex font-normal">
+              <User className="w-3 h-3 text-emerald-400 shrink-0" />
               <span className="truncate">{driver.name}</span>
             </span>
           )}

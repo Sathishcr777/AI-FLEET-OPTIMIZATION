@@ -60,15 +60,15 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({
 }) => {
   return (
     <Card
-      className={clsx("flex flex-col h-full select-none shadow-card", className)}
+      className={clsx("flex flex-col h-full select-none shadow-card bg-[#111C2D] border border-[#1F2E47]", className)}
       header={
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-blue-600" />
-          <span className="font-semibold text-slate-900 font-sans">Incident Triage Filters</span>
+          <Filter className="w-4 h-4 text-blue-400" />
+          <span className="font-semibold text-white font-sans">Incident Triage Filters</span>
         </div>
       }
       headerAction={
-        <Button size="sm" variant="ghost" onClick={onReset} leftIcon={<RotateCcw className="w-3 h-3" />}>
+        <Button size="sm" variant="ghost" onClick={onReset} leftIcon={<RotateCcw className="w-3 h-3 text-slate-400" />}>
           Reset
         </Button>
       }
@@ -76,46 +76,46 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({
       <div className="space-y-4 font-sans text-xs overflow-y-auto pr-1">
         {/* Search Input */}
         <div>
-          <label className="text-[10px] uppercase text-slate-500 font-semibold mb-1 block">
+          <label className="text-[10px] uppercase text-slate-400 font-semibold mb-1 block font-mono tracking-wider">
             Search Incidents
           </label>
           <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search alert title, message, ID..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+              className="w-full pl-9 pr-3 py-2 bg-[#0B0F19] border border-[#1F2E47] rounded-lg text-white placeholder:text-slate-500 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
             />
           </div>
         </div>
 
         {/* Severity Priority Filter */}
         <div>
-          <label className="text-[10px] uppercase text-slate-500 font-semibold mb-1.5 block">
+          <label className="text-[10px] uppercase text-slate-400 font-semibold mb-1.5 block font-mono tracking-wider">
             Severity Level
           </label>
           <div className="grid grid-cols-2 gap-1.5">
             {[
-              { id: "ALL", label: "All Severities" },
-              { id: "CRITICAL", label: "Critical", color: "text-rose-600" },
-              { id: "HIGH", label: "High", color: "text-rose-600" },
-              { id: "MEDIUM", label: "Medium", color: "text-amber-600" },
-              { id: "LOW", label: "Low / Info", color: "text-blue-600" },
+              { id: "ALL", label: "All Severities", activeColor: "text-white" },
+              { id: "CRITICAL", label: "Critical", color: "text-rose-400", activeColor: "text-rose-200" },
+              { id: "HIGH", label: "High", color: "text-amber-400", activeColor: "text-amber-200" },
+              { id: "MEDIUM", label: "Medium", color: "text-blue-400", activeColor: "text-blue-200" },
+              { id: "LOW", label: "Low / Info", color: "text-slate-400", activeColor: "text-slate-200" },
             ].map((sev) => (
               <button
                 key={sev.id}
                 type="button"
                 onClick={() => setSeverityFilter(sev.id)}
                 className={clsx(
-                  "px-2.5 py-1.5 rounded-lg border text-left font-semibold text-xs transition-colors",
+                  "px-2.5 py-1.5 rounded-lg border text-left font-semibold text-xs transition-all",
                   severityFilter === sev.id
-                    ? "bg-blue-50 border-blue-600 text-blue-700 shadow-sm"
-                    : "bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    ? "bg-blue-600/30 border-blue-500 text-white shadow-glowBlue font-bold"
+                    : "bg-[#0B0F19] border-[#1F2E47] text-slate-400 hover:text-white hover:bg-[#16253B] hover:border-[#2A3F5F]"
                 )}
               >
-                <span className={sev.color || "text-slate-700"}>{sev.label}</span>
+                <span className={severityFilter === sev.id ? sev.activeColor || "text-white" : sev.color || "text-slate-300"}>{sev.label}</span>
               </button>
             ))}
           </div>
@@ -123,7 +123,7 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({
 
         {/* Operational Status Filter */}
         <div>
-          <label className="text-[10px] uppercase text-slate-500 font-semibold mb-1.5 block">
+          <label className="text-[10px] uppercase text-slate-400 font-semibold mb-1.5 block font-mono tracking-wider">
             Triage Status
           </label>
           <div className="grid grid-cols-3 gap-1.5">
@@ -138,10 +138,10 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({
                 type="button"
                 onClick={() => setStatusFilter(st.id)}
                 className={clsx(
-                  "px-2 py-1.5 rounded-lg border text-center font-semibold text-xs transition-colors",
+                  "px-2 py-1.5 rounded-lg border text-center font-semibold text-xs transition-all",
                   statusFilter === st.id
-                    ? "bg-blue-50 border-blue-600 text-blue-700 shadow-sm"
-                    : "bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    ? "bg-blue-600/30 border-blue-500 text-white shadow-glowBlue font-bold"
+                    : "bg-[#0B0F19] border-[#1F2E47] text-slate-400 hover:text-white hover:bg-[#16253B] hover:border-[#2A3F5F]"
                 )}
               >
                 {st.label}
@@ -152,17 +152,17 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({
 
         {/* Alert Type Dropdown */}
         <div>
-          <label className="text-[10px] uppercase text-slate-500 font-semibold mb-1 flex items-center gap-1">
-            <Flame className="w-3.5 h-3.5 text-amber-500" />
+          <label className="text-[10px] uppercase text-slate-400 font-semibold mb-1 flex items-center gap-1 font-mono tracking-wider">
+            <Flame className="w-3.5 h-3.5 text-amber-400" />
             <span>Incident Subsystem / Type</span>
           </label>
           <select
             value={alertTypeFilter}
             onChange={(e) => setAlertTypeFilter(e.target.value)}
-            className="w-full px-2.5 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+            className="w-full px-2.5 py-2 bg-[#0B0F19] border border-[#1F2E47] rounded-lg text-slate-200 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           >
             {ALERT_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
+              <option key={t.value} value={t.value} className="bg-[#0B0F19] text-white">
                 {t.label}
               </option>
             ))}
@@ -171,18 +171,18 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({
 
         {/* Vehicle Asset Filter */}
         <div>
-          <label className="text-[10px] uppercase text-slate-500 font-semibold mb-1 flex items-center gap-1">
-            <Truck className="w-3.5 h-3.5 text-blue-600" />
+          <label className="text-[10px] uppercase text-slate-400 font-semibold mb-1 flex items-center gap-1 font-mono tracking-wider">
+            <Truck className="w-3.5 h-3.5 text-blue-400" />
             <span>Vehicle Asset Filter</span>
           </label>
           <select
             value={vehicleFilter}
             onChange={(e) => setVehicleFilter(e.target.value)}
-            className="w-full px-2.5 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+            className="w-full px-2.5 py-2 bg-[#0B0F19] border border-[#1F2E47] rounded-lg text-slate-200 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="ALL">All Fleet Vehicles</option>
+            <option value="ALL" className="bg-[#0B0F19] text-white">All Fleet Vehicles</option>
             {vehicles.map((v) => (
-              <option key={v.id} value={v.id}>
+              <option key={v.id} value={v.id} className="bg-[#0B0F19] text-white">
                 {v.name} ({v.license_plate})
               </option>
             ))}

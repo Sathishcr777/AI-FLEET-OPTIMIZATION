@@ -65,11 +65,11 @@ export const AlertVolumeTrendChart: React.FC<AlertVolumeTrendChartProps> = ({
 
   return (
     <Card
-      className={clsx("flex flex-col select-none shadow-card", className)}
+      className={clsx("flex flex-col select-none shadow-card bg-[#111C2D] border border-[#1F2E47]", className)}
       header={
         <div className="flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-blue-600" />
-          <span className="font-semibold text-sm text-slate-900 font-sans">
+          <BarChart3 className="w-4 h-4 text-cyan-400" />
+          <span className="font-semibold text-sm text-white font-sans">
             Incident Category Distribution & Frequency
           </span>
           <Badge variant="brand" size="sm">
@@ -78,22 +78,27 @@ export const AlertVolumeTrendChart: React.FC<AlertVolumeTrendChartProps> = ({
         </div>
       }
       headerAction={
-        <span className="text-xs font-mono text-slate-500">
-          Open: <strong className="text-rose-600">{activeTotal}</strong> / {total} Total
+        <span className="text-xs font-mono text-slate-400">
+          Open: <strong className="text-rose-400 font-bold">{activeTotal}</strong> / {total} Total
         </span>
       }
     >
       <div className="space-y-3 font-sans text-xs">
         {categoryData.length === 0 ? (
-          <div className="w-full h-40 flex flex-col items-center justify-center p-4 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 text-center">
-            <ShieldAlert className="w-6 h-6 mb-1 text-emerald-600" />
-            <span>No alerts recorded in database log.</span>
+          <div className="w-full h-40 flex flex-col items-center justify-center p-6 rounded-xl bg-[#0B0F19] border border-[#1F2E47] text-slate-400 text-center select-none shadow-card">
+            <div className="p-2.5 rounded-2xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 mb-2">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider font-mono">SYSTEM CLEAR</h4>
+            <p className="text-xs text-slate-400 mt-1 max-w-sm font-sans">
+              No alerts recorded in database log. Live monitoring is active.
+            </p>
           </div>
         ) : (
           <div className="w-full relative" style={{ height }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={categoryData} margin={{ top: 8, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" opacity={0.7} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1F2E47" opacity={0.8} />
                 <XAxis
                   dataKey="shortName"
                   stroke="#64748B"
@@ -113,9 +118,9 @@ export const AlertVolumeTrendChart: React.FC<AlertVolumeTrendChartProps> = ({
                     if (active && payload && payload.length) {
                       const item = payload[0].payload;
                       return (
-                        <div className="p-2 bg-slate-900/95 text-white border border-slate-700 shadow-xl rounded-lg text-xs font-sans">
+                        <div className="p-2.5 bg-[#111C2D] text-white border border-[#1F2E47] shadow-2xl rounded-xl text-xs font-sans">
                           <p className="font-bold text-white">{item.name}</p>
-                          <p className="text-blue-400 font-mono mt-0.5">Total Incidents: {item.count}</p>
+                          <p className="text-cyan-400 font-mono mt-0.5">Total Incidents: {item.count}</p>
                           {item.critical > 0 && (
                             <p className="text-rose-400 font-mono">Critical Priority: {item.critical}</p>
                           )}
@@ -137,7 +142,7 @@ export const AlertVolumeTrendChart: React.FC<AlertVolumeTrendChartProps> = ({
 
         <div className="flex items-center justify-between text-[10px] text-slate-400 font-sans px-1">
           <span>Derived from live incident queue & PostgreSQL alert ledger.</span>
-          <span className="font-mono text-slate-500">{categoryData.length} Incident Types</span>
+          <span className="font-mono text-cyan-400">{categoryData.length} Incident Types</span>
         </div>
       </div>
     </Card>

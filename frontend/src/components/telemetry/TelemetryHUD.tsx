@@ -51,10 +51,12 @@ export const TelemetryHUD: React.FC<TelemetryHUDProps> = ({
     );
   }
 
-  const fuel = telemetry?.fuel_level_pct ?? 75.0;
-  const battery = telemetry?.battery_voltage ?? 13.4;
-  const tire = telemetry?.tire_pressure_psi ?? 34.0;
-  const isAnomaly = Boolean(telemetry?.is_anomaly);
+  // Persistent fallback to prevent temporary blanking between telemetry frames
+  const effectiveTelemetry = telemetry ?? history[history.length - 1] ?? null;
+  const fuel = effectiveTelemetry?.fuel_level_pct ?? 75.0;
+  const battery = effectiveTelemetry?.battery_voltage ?? 13.4;
+  const tire = effectiveTelemetry?.tire_pressure_psi ?? 34.0;
+  const isAnomaly = Boolean(effectiveTelemetry?.is_anomaly);
 
   // Tire status
   const tireStatus = tire < 26.0 ? "CRITICAL" : tire < 30.0 || tire > 38.0 ? "WARNING" : "GOOD";
@@ -169,7 +171,7 @@ export const TelemetryHUD: React.FC<TelemetryHUDProps> = ({
 
       {/* Main Viewport: Gauges vs Recent Trend vs Target Ranges */}
       {viewMode === "gauges" ? (
-        <GaugeCluster telemetry={telemetry} />
+        <GaugeCluster telemetry={effectiveTelemetry} />
       ) : viewMode === "trend" ? (
         <div className="p-3.5 rounded-2xl bg-[#0B0F19] border border-slate-800">
           <TelemetryTrendMiniChart
@@ -182,7 +184,7 @@ export const TelemetryHUD: React.FC<TelemetryHUDProps> = ({
       ) : (
         <VehicleSensorComparison
           vehicle={vehicle}
-          telemetry={telemetry}
+          telemetry={effectiveTelemetry}
         />
       )}
 

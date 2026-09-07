@@ -11,9 +11,12 @@ import {
   CheckCircle2,
   Cpu,
   Activity,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useTelemetryStore } from "../../hooks/useTelemetryStore";
 import { useAuthStore } from "../../hooks/useAuthStore";
+import { useTheme } from "../../hooks/useTheme";
 import { Button } from "../common/Button";
 import { Tooltip } from "../common/Tooltip";
 import { Modal } from "../common/Modal";
@@ -31,6 +34,8 @@ export const Header: React.FC<HeaderProps> = ({
   const connectionStatus = useTelemetryStore((s) => s.connectionStatus);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const theme = useTheme((s) => s.theme);
+  const toggleTheme = useTheme((s) => s.toggleTheme);
 
   const [currentTime, setCurrentTime] = useState<string>("");
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
@@ -149,6 +154,22 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <span className="hidden sm:inline">Simulator Cockpit</span>
             </Button>
+          </Tooltip>
+
+          {/* Theme Mode Toggle Button */}
+          <Tooltip content={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-[#16253B] border border-[#2A3F5F] transition-all cursor-pointer outline-none focus-ring"
+              aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+            >
+              {theme === "dark" ? (
+                <Sun className="w-5 h-5 text-amber-400 hover:text-amber-300 transition-colors" />
+              ) : (
+                <Moon className="w-5 h-5 text-blue-500 hover:text-blue-600 transition-colors" />
+              )}
+            </button>
           </Tooltip>
 
           <Tooltip content={`${activeAlertCount} Active Incidents`}>

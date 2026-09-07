@@ -19,7 +19,7 @@ import { FleetHealthTrendChart } from "../components/analytics/FleetHealthTrendC
 import { PriorityActionsPanel } from "../components/analytics/PriorityActionsPanel";
 import { ScenarioDrawer } from "../components/layout/ScenarioDrawer";
 import { LiveStatusBadge } from "../components/common/LiveStatusBadge";
-import { Button } from "../common/Button";
+import { Button } from "../components/common/Button";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/common/Card";
 import { Skeleton } from "../components/common/Skeleton";
 import {

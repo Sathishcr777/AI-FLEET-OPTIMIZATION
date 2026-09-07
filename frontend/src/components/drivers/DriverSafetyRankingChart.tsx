@@ -14,6 +14,7 @@ import { Badge } from "../common/Badge";
 import { Driver } from "../../types/api";
 import { Trophy, ShieldCheck, User } from "lucide-react";
 import { clsx } from "clsx";
+import { CHART_COLORS } from "../charts/chartTheme";
 
 export interface DriverSafetyRankingChartProps {
   drivers: Driver[];

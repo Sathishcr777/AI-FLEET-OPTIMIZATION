@@ -15,6 +15,7 @@ import {
 import { BarChart3, CheckCircle2, Lightbulb } from "lucide-react";
 import { clsx } from "clsx";
 import { Skeleton } from "../common/Skeleton";
+import { CHART_COLORS } from "../charts/chartTheme";
 
 export interface DriverBehaviorChartProps {
   analytics?: DriverAnalyticsResponse | null;
@@ -144,6 +145,8 @@ export const DriverBehaviorChart: React.FC<DriverBehaviorChartProps> = ({
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+
             {primaryFocus && (
               <div className="p-3.5 rounded-xl bg-[#0B0F19] border border-[#1F2E47] flex items-start gap-2.5 text-xs font-sans">
                 <Lightbulb className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />

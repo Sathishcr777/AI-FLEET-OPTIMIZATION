@@ -84,11 +84,11 @@ export const FleetPerformanceComparison: React.FC<FleetPerformanceComparisonProp
 
   return (
     <Card
-      className={clsx("flex flex-col select-none shadow-card", className)}
+      className={clsx("flex flex-col select-none shadow-card bg-[#111C2D] border border-[#1F2E47]", className)}
       header={
         <div className="flex items-center gap-2">
-          <BarChart2 className="w-4 h-4 text-blue-600" />
-          <span className="font-semibold text-sm text-slate-900 font-sans">
+          <BarChart2 className="w-4 h-4 text-cyan-400" />
+          <span className="font-semibold text-sm text-white font-sans">
             Fleet Asset Metric Comparison
           </span>
           <Badge variant="brand" size="sm">
@@ -97,13 +97,13 @@ export const FleetPerformanceComparison: React.FC<FleetPerformanceComparisonProp
         </div>
       }
       headerAction={
-        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
+        <div className="flex items-center gap-1 bg-[#0B0F19] p-0.5 rounded-lg border border-[#1F2E47] text-xs">
           <button
             type="button"
             onClick={() => setMetric("health")}
             className={clsx(
-              "px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all cursor-pointer",
-              metric === "health" ? "bg-white text-slate-900 shadow-xs font-bold" : "text-slate-500 hover:text-slate-900"
+              "px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer font-mono",
+              metric === "health" ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500" : "text-slate-400 hover:text-white"
             )}
           >
             Health
@@ -112,8 +112,8 @@ export const FleetPerformanceComparison: React.FC<FleetPerformanceComparisonProp
             type="button"
             onClick={() => setMetric("fuel_level_pct")}
             className={clsx(
-              "px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all cursor-pointer",
-              metric === "fuel_level_pct" ? "bg-white text-slate-900 shadow-xs font-bold" : "text-slate-500 hover:text-slate-900"
+              "px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer font-mono",
+              metric === "fuel_level_pct" ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500" : "text-slate-400 hover:text-white"
             )}
           >
             Fuel
@@ -122,8 +122,8 @@ export const FleetPerformanceComparison: React.FC<FleetPerformanceComparisonProp
             type="button"
             onClick={() => setMetric("speed")}
             className={clsx(
-              "px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all cursor-pointer",
-              metric === "speed" ? "bg-white text-slate-900 shadow-xs font-bold" : "text-slate-500 hover:text-slate-900"
+              "px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer font-mono",
+              metric === "speed" ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500" : "text-slate-400 hover:text-white"
             )}
           >
             Speed
@@ -132,8 +132,8 @@ export const FleetPerformanceComparison: React.FC<FleetPerformanceComparisonProp
             type="button"
             onClick={() => setMetric("engine_temp_c")}
             className={clsx(
-              "px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all cursor-pointer",
-              metric === "engine_temp_c" ? "bg-white text-slate-900 shadow-xs font-bold" : "text-slate-500 hover:text-slate-900"
+              "px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer font-mono",
+              metric === "engine_temp_c" ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500" : "text-slate-400 hover:text-white"
             )}
           >
             Temp
@@ -142,8 +142,8 @@ export const FleetPerformanceComparison: React.FC<FleetPerformanceComparisonProp
             type="button"
             onClick={() => setMetric("oil_pressure_psi")}
             className={clsx(
-              "px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all cursor-pointer",
-              metric === "oil_pressure_psi" ? "bg-white text-slate-900 shadow-xs font-bold" : "text-slate-500 hover:text-slate-900"
+              "px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all cursor-pointer font-mono",
+              metric === "oil_pressure_psi" ? "bg-blue-600 text-white shadow-glow-sm font-bold border border-blue-500" : "text-slate-400 hover:text-white"
             )}
           >
             Oil
@@ -153,14 +153,14 @@ export const FleetPerformanceComparison: React.FC<FleetPerformanceComparisonProp
     >
       <div className="space-y-2 font-sans text-xs">
         {chartData.length === 0 ? (
-          <div className="w-full h-40 flex flex-col items-center justify-center p-4 rounded-lg bg-slate-50 border border-slate-200 text-slate-400 text-center">
+          <div className="w-full h-40 flex flex-col items-center justify-center p-4 rounded-lg bg-[#0B0F19] border border-[#1F2E47] text-slate-400 text-center">
             <span>No active vehicles streaming telematics.</span>
           </div>
         ) : (
           <div className="w-full relative" style={{ height }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 8, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" opacity={0.7} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1F2E47" opacity={0.8} />
                 <XAxis
                   dataKey="shortName"
                   stroke="#64748B"
@@ -179,13 +179,13 @@ export const FleetPerformanceComparison: React.FC<FleetPerformanceComparisonProp
                     if (active && payload && payload.length) {
                       const item = payload[0].payload;
                       return (
-                        <div className="p-2 bg-slate-900/95 text-white border border-slate-700 shadow-xl rounded-lg text-xs font-mono">
+                        <div className="p-2.5 bg-[#111C2D] text-white border border-[#1F2E47] shadow-2xl rounded-xl text-xs font-mono">
                           <p className="font-bold text-white font-sans">{item.name}</p>
-                          <p className="text-[10px] text-slate-400 font-mono">{item.shortName}</p>
+                          <p className="text-[10px] text-cyan-400 font-mono">{item.shortName}</p>
                           <p className="text-sm font-bold text-emerald-400 mt-1">
                             {item.value} {item.unit}
                           </p>
-                          <p className="text-[10px] text-slate-300 mt-0.5">Click to select asset</p>
+                          <p className="text-[10px] text-slate-400 mt-0.5">Click to inspect asset</p>
                         </div>
                       );
                     }
@@ -202,7 +202,7 @@ export const FleetPerformanceComparison: React.FC<FleetPerformanceComparisonProp
                     <Cell
                       key={`bar-${idx}`}
                       fill={entry.color}
-                      stroke={entry.isSelected ? "#1E293B" : "none"}
+                      stroke={entry.isSelected ? "#38BDF8" : "none"}
                       strokeWidth={entry.isSelected ? 2 : 0}
                     />
                   ))}
@@ -214,7 +214,7 @@ export const FleetPerformanceComparison: React.FC<FleetPerformanceComparisonProp
 
         <div className="flex items-center justify-between text-[10px] text-slate-400 font-sans px-1">
           <span>Click any bar to inspect telemetry and trajectory on the map.</span>
-          <span className="font-mono text-slate-500">{vehicles.length} Units Active</span>
+          <span className="font-mono text-cyan-400">{vehicles.length} Units Active</span>
         </div>
       </div>
     </Card>

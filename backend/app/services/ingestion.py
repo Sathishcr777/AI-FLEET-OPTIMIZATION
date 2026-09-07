@@ -29,6 +29,8 @@ class IngestionService:
     def __init__(self):
         # In-memory latest telemetry per vehicle UUID -> TelemetryPayload
         self.latest_telemetry: Dict[uuid.UUID, TelemetryPayload] = {}
+        # In-memory chronological ring buffer of recent telemetry packets per vehicle
+        self._history_telemetry: Dict[uuid.UUID, deque] = {}
         # Per-vehicle bounded ring buffer of recent signatures (time, odometer) for deduplication
         self._recent_signatures: Dict[uuid.UUID, deque] = {}
         self._recent_signatures_set: Dict[uuid.UUID, Set[Tuple[str, float]]] = {}
@@ -79,6 +81,11 @@ class IngestionService:
                 if existing is None or payload.time >= existing.time:
                     self.latest_telemetry[v_id] = payload
 
+                # Append to chronological history buffer
+                if v_id not in self._history_telemetry:
+                    self._history_telemetry[v_id] = deque(maxlen=200)
+                self._history_telemetry[v_id].append(payload)
+
             # 3. Broadcast to active WebSocket connections
             await ws_manager.broadcast_telemetry(payload.model_dump(mode="json"))
 
@@ -108,6 +115,16 @@ class IngestionService:
     def get_latest_for_vehicle(self, vehicle_id: uuid.UUID) -> Optional[TelemetryPayload]:
         """Get latest cached telemetry for a specific vehicle."""
         return self.latest_telemetry.get(vehicle_id)
+
+    def get_history_for_vehicle(self, vehicle_id: uuid.UUID, limit: int = 100) -> List[TelemetryPayload]:
+        """Get recent in-memory telemetry history for a vehicle in chronological order."""
+        history = self._history_telemetry.get(vehicle_id)
+        if not history:
+            return []
+        items = list(history)
+        if len(items) > limit:
+            items = items[-limit:]
+        return items
 
     def get_all_latest(self) -> Dict[uuid.UUID, TelemetryPayload]:
         """Get all latest telemetry states."""

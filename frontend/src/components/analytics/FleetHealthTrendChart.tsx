@@ -111,7 +111,7 @@ export const FleetHealthTrendChart: React.FC<FleetHealthTrendChartProps> = ({
         </div>
       }
       summaryMetrics={summaryMetrics}
-      isEmpty={chartData.length < 2}
+      isEmpty={chartData.length < 1}
       emptyPreset="collecting_history"
       emptyMessage="Collecting fleet history... Observations accumulate as telemetry streams."
       height={height}
@@ -174,6 +174,7 @@ export const FleetHealthTrendChart: React.FC<FleetHealthTrendChartProps> = ({
             stroke="#10B981"
             strokeWidth={2.5}
             fill="url(#fleetHealthGrad)"
+            dot={chartData.length <= 2 ? { r: 3, fill: "#10B981" } : false}
             isAnimationActive={false}
           />
         </AreaChart>

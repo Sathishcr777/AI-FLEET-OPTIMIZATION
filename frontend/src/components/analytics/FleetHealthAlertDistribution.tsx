@@ -58,7 +58,7 @@ export const FleetHealthAlertDistribution: React.FC<FleetHealthAlertDistribution
     if (severityCounts.critical > 0 || healthCounts.critical > 0) {
       return {
         label: "CRITICAL ATTENTION REQUIRED",
-        color: "text-rose-700 bg-rose-50 border-rose-200",
+        color: "text-rose-300 bg-rose-950/40 border-rose-500/40",
         badge: "critical",
         explanation: `${severityCounts.critical} critical incident(s) and ${healthCounts.critical} asset(s) in critical health state.`,
       };
@@ -66,14 +66,14 @@ export const FleetHealthAlertDistribution: React.FC<FleetHealthAlertDistribution
     if (severityCounts.high > 0 || healthCounts.warning > 0) {
       return {
         label: "ELEVATED OPERATIONAL RISK",
-        color: "text-amber-800 bg-amber-50 border-amber-200",
+        color: "text-amber-300 bg-amber-950/40 border-amber-500/40",
         badge: "warning",
         explanation: `${severityCounts.high} high-priority incident(s) requiring supervisor triage.`,
       };
     }
     return {
       label: "FLEET CONDITION STABLE",
-      color: "text-emerald-800 bg-emerald-50 border-emerald-200",
+      color: "text-emerald-300 bg-emerald-950/40 border-emerald-500/40",
       badge: "success",
       explanation: "All telemetry signals, diagnostics, and driver safety behaviors operating within normal bounds.",
     };
@@ -87,11 +87,11 @@ export const FleetHealthAlertDistribution: React.FC<FleetHealthAlertDistribution
 
   return (
     <Card
-      className={clsx("flex flex-col select-none shadow-card", className)}
+      className={clsx("flex flex-col select-none shadow-card bg-[#111C2D] border border-[#1F2E47]", className)}
       header={
         <div className="flex items-center gap-2">
-          <ShieldAlert className="w-4 h-4 text-blue-600" />
-          <span className="font-semibold text-sm text-slate-900 font-sans">
+          <ShieldAlert className="w-4 h-4 text-cyan-400" />
+          <span className="font-semibold text-sm text-white font-sans">
             Fleet Condition & Incident Distribution
           </span>
         </div>
@@ -104,12 +104,12 @@ export const FleetHealthAlertDistribution: React.FC<FleetHealthAlertDistribution
     >
       <div className="space-y-4 font-sans text-xs">
         {/* Overall Fleet Status Banner */}
-        <div className={clsx("p-3 rounded-xl border flex items-center justify-between gap-3", conditionStatus.color)}>
+        <div className={clsx("p-3 rounded-xl border flex items-center justify-between gap-3 shadow-card", conditionStatus.color)}>
           <div className="flex items-center gap-2">
             {conditionStatus.badge === "critical" ? (
-              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
             ) : (
-              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
             )}
             <div>
               <div className="font-bold text-xs">{conditionStatus.label}</div>
@@ -118,7 +118,7 @@ export const FleetHealthAlertDistribution: React.FC<FleetHealthAlertDistribution
           </div>
 
           <Link to="/alerts">
-            <span className="text-[11px] font-semibold underline shrink-0 flex items-center gap-0.5">
+            <span className="text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 underline shrink-0 flex items-center gap-0.5 cursor-pointer">
               <span>View Alerts</span>
               <ExternalLink className="w-3 h-3" />
             </span>
@@ -126,53 +126,65 @@ export const FleetHealthAlertDistribution: React.FC<FleetHealthAlertDistribution
         </div>
 
         {/* 1. Alert Severity Distribution */}
-        <div className="space-y-1.5">
-          <div className="flex justify-between text-xs text-slate-500 font-sans">
-            <span className="font-semibold text-slate-700">Incident Severity Breakdown</span>
-            <span className="font-mono text-slate-400">Open Queue ({severityCounts.total})</span>
+        {severityCounts.total === 0 ? (
+          <div className="p-4 rounded-xl bg-[#0B0F19] border border-[#1F2E47] flex items-center justify-center gap-3 text-center">
+            <div className="p-2 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-400">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider font-mono">SYSTEM CLEAR</h4>
+              <p className="text-[11px] text-slate-400 mt-0.5">No alerts recorded in database log. Live monitoring is active.</p>
+            </div>
           </div>
+        ) : (
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs text-slate-400 font-sans">
+              <span className="font-semibold text-slate-200">Incident Severity Breakdown</span>
+              <span className="font-mono text-cyan-400">Open Queue ({severityCounts.total})</span>
+            </div>
 
-          {/* Distribution Bar */}
-          <div className="h-2.5 w-full rounded-full bg-slate-100 overflow-hidden flex border border-slate-200">
-            {pctCrit > 0 && <div style={{ width: `${pctCrit}%` }} className="bg-rose-500 transition-all" title={`Critical: ${severityCounts.critical}`} />}
-            {pctHigh > 0 && <div style={{ width: `${pctHigh}%` }} className="bg-amber-500 transition-all" title={`High: ${severityCounts.high}`} />}
-            {pctMed > 0 && <div style={{ width: `${pctMed}%` }} className="bg-blue-500 transition-all" title={`Medium: ${severityCounts.medium}`} />}
-            {pctLow > 0 && <div style={{ width: `${pctLow}%` }} className="bg-slate-400 transition-all" title={`Low: ${severityCounts.low}`} />}
-          </div>
+            {/* Distribution Bar */}
+            <div className="h-2.5 w-full rounded-full bg-[#0B0F19] overflow-hidden flex border border-[#1F2E47]">
+              {pctCrit > 0 && <div style={{ width: `${pctCrit}%` }} className="bg-rose-500 transition-all" title={`Critical: ${severityCounts.critical}`} />}
+              {pctHigh > 0 && <div style={{ width: `${pctHigh}%` }} className="bg-amber-500 transition-all" title={`High: ${severityCounts.high}`} />}
+              {pctMed > 0 && <div style={{ width: `${pctMed}%` }} className="bg-blue-500 transition-all" title={`Medium: ${severityCounts.medium}`} />}
+              {pctLow > 0 && <div style={{ width: `${pctLow}%` }} className="bg-slate-500 transition-all" title={`Low: ${severityCounts.low}`} />}
+            </div>
 
-          {/* 4 Severity Columns */}
-          <div className="grid grid-cols-4 gap-2 pt-1 text-center">
-            <div className="p-2 rounded-lg bg-rose-50/70 border border-rose-200">
-              <span className="text-[10px] font-bold text-rose-800 uppercase block font-mono">Critical</span>
-              <span className="text-rose-900 font-bold text-sm font-mono">{severityCounts.critical}</span>
-            </div>
-            <div className="p-2 rounded-lg bg-amber-50/70 border border-amber-200">
-              <span className="text-[10px] font-bold text-amber-800 uppercase block font-mono">High</span>
-              <span className="text-amber-900 font-bold text-sm font-mono">{severityCounts.high}</span>
-            </div>
-            <div className="p-2 rounded-lg bg-blue-50/70 border border-blue-200">
-              <span className="text-[10px] font-bold text-blue-800 uppercase block font-mono">Medium</span>
-              <span className="text-blue-900 font-bold text-sm font-mono">{severityCounts.medium}</span>
-            </div>
-            <div className="p-2 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="text-[10px] font-bold text-slate-600 uppercase block font-mono">Low</span>
-              <span className="text-slate-800 font-bold text-sm font-mono">{severityCounts.low}</span>
+            {/* 4 Severity Columns */}
+            <div className="grid grid-cols-4 gap-2 pt-1 text-center">
+              <div className="p-2 rounded-lg bg-rose-950/30 border border-rose-500/30">
+                <span className="text-[10px] font-bold text-rose-400 uppercase block font-mono">Critical</span>
+                <span className="text-rose-300 font-bold text-sm font-mono">{severityCounts.critical}</span>
+              </div>
+              <div className="p-2 rounded-lg bg-amber-950/30 border border-amber-500/30">
+                <span className="text-[10px] font-bold text-amber-400 uppercase block font-mono">High</span>
+                <span className="text-amber-300 font-bold text-sm font-mono">{severityCounts.high}</span>
+              </div>
+              <div className="p-2 rounded-lg bg-blue-950/30 border border-blue-500/30">
+                <span className="text-[10px] font-bold text-blue-400 uppercase block font-mono">Medium</span>
+                <span className="text-blue-300 font-bold text-sm font-mono">{severityCounts.medium}</span>
+              </div>
+              <div className="p-2 rounded-lg bg-[#0B0F19] border border-[#1F2E47]">
+                <span className="text-[10px] font-bold text-slate-400 uppercase block font-mono">Low</span>
+                <span className="text-slate-300 font-bold text-sm font-mono">{severityCounts.low}</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* 2. Asset Health Overview */}
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+        <div className="pt-2 border-t border-[#1F2E47] flex items-center justify-between text-xs text-slate-400">
           <span className="flex items-center gap-1.5 font-medium">
-            <Activity className="w-3.5 h-3.5 text-blue-600" />
-            <span>Asset Status:</span>
+            <Activity className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="text-slate-300">Asset Status:</span>
           </span>
           <div className="flex items-center gap-2 font-mono text-[11px]">
-            <span className="text-emerald-700 font-bold">{healthCounts.good} Nominal</span>
-            <span className="text-slate-300">·</span>
-            <span className="text-amber-700 font-bold">{healthCounts.warning} Degraded</span>
-            <span className="text-slate-300">·</span>
-            <span className="text-rose-700 font-bold">{healthCounts.critical} Critical</span>
+            <span className="text-emerald-400 font-bold">{healthCounts.good} Nominal</span>
+            <span className="text-slate-600">·</span>
+            <span className="text-amber-400 font-bold">{healthCounts.warning} Degraded</span>
+            <span className="text-slate-600">·</span>
+            <span className="text-rose-400 font-bold">{healthCounts.critical} Critical</span>
           </div>
         </div>
       </div>

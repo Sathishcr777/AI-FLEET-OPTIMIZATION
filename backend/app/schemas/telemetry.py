@@ -41,6 +41,7 @@ class LatestTelemetryMap(BaseModel):
     engine_temp_c: float
     oil_pressure_psi: float
     tire_pressure_psi: float
+    battery_voltage: float
     odometer_km: float
     is_anomaly: bool
     last_updated: datetime

@@ -120,16 +120,16 @@ export const ExecutiveInsightsPanel: React.FC<ExecutiveInsightsPanelProps> = ({
 
   return (
     <Card
-      className={clsx("flex flex-col h-full select-none shadow-card", className)}
+      className={clsx("flex flex-col h-full select-none shadow-card bg-[#111C2D] border border-[#1F2E47]", className)}
       header={
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-blue-600" />
-          <span className="font-semibold text-slate-900 font-sans">Operational Intelligence & Actionable Insights</span>
+          <Sparkles className="w-4 h-4 text-cyan-400" />
+          <span className="font-semibold text-white font-sans">Operational Intelligence & Actionable Insights</span>
         </div>
       }
       headerAction={
         <Link to="/alerts">
-          <Button size="sm" variant="secondary" leftIcon={<ShieldAlert className="w-3.5 h-3.5 text-amber-500" />}>
+          <Button size="sm" variant="secondary" leftIcon={<ShieldAlert className="w-3.5 h-3.5 text-amber-400" />}>
             Open Incident Triage
           </Button>
         </Link>
@@ -143,27 +143,27 @@ export const ExecutiveInsightsPanel: React.FC<ExecutiveInsightsPanelProps> = ({
               className={clsx(
                 "p-3.5 rounded-xl border space-y-1.5 transition-colors shadow-sm",
                 item.type === "critical"
-                  ? "bg-rose-50/70 border-rose-200"
+                  ? "bg-rose-950/40 border-rose-500/40 text-rose-200"
                   : item.type === "warning"
-                  ? "bg-amber-50/70 border-amber-200"
+                  ? "bg-amber-950/40 border-amber-500/40 text-amber-200"
                   : item.type === "success"
-                  ? "bg-emerald-50/70 border-emerald-200"
-                  : "bg-blue-50/70 border-blue-200"
+                  ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200"
+                  : "bg-blue-950/40 border-blue-500/40 text-blue-200"
               )}
             >
               <div className="flex items-center gap-2">
                 {item.type === "critical" ? (
-                  <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
                 ) : item.type === "warning" ? (
-                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                 ) : item.type === "success" ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                 ) : (
-                  <Activity className="w-4 h-4 text-blue-600 shrink-0" />
+                  <Activity className="w-4 h-4 text-cyan-400 shrink-0" />
                 )}
-                <span className="font-semibold text-slate-900 text-xs font-sans">{item.title}</span>
+                <span className="font-semibold text-white text-xs font-sans">{item.title}</span>
               </div>
-              <p className="text-slate-600 font-sans text-xs leading-relaxed">{item.desc}</p>
+              <p className="text-slate-300 font-sans text-xs leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>

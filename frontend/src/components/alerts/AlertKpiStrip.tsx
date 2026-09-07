@@ -83,20 +83,32 @@ export const AlertKpiStrip: React.FC<AlertKpiStripProps> = ({ summary, className
       </div>
 
       {/* Severity Proportion Strip */}
-      <div className="p-3 rounded-xl bg-white border border-slate-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-sans">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-slate-700">Incident Severity Distribution:</span>
-          <span className="font-mono text-slate-500 text-[11px]">
-            {summary.critical} Critical · {summary.high} High · {summary.medium} Medium · {summary.low} Low
+      <div className="p-3.5 rounded-xl bg-[#111C2D] border border-[#1F2E47] shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-sans">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="font-semibold text-slate-200">Incident Severity Distribution:</span>
+          <span className="font-mono text-slate-400 text-[11px] flex items-center gap-2">
+            <span className="text-rose-400 font-semibold">{summary.critical} Critical</span>
+            <span className="text-slate-600">·</span>
+            <span className="text-amber-400 font-semibold">{summary.high} High</span>
+            <span className="text-slate-600">·</span>
+            <span className="text-blue-400 font-semibold">{summary.medium} Medium</span>
+            <span className="text-slate-600">·</span>
+            <span className="text-slate-400">{summary.low} Low</span>
           </span>
         </div>
 
-        <div className="flex-1 max-w-md">
-          <div className="h-2.5 w-full rounded-full bg-slate-100 overflow-hidden flex border border-slate-200">
-            {pctCrit > 0 && <div style={{ width: `${pctCrit}%` }} className="bg-rose-500 transition-all" title={`Critical: ${summary.critical} (${pctCrit}%)`} />}
-            {pctHigh > 0 && <div style={{ width: `${pctHigh}%` }} className="bg-amber-500 transition-all" title={`High: ${summary.high} (${pctHigh}%)`} />}
-            {pctMed > 0 && <div style={{ width: `${pctMed}%` }} className="bg-blue-500 transition-all" title={`Medium: ${summary.medium} (${pctMed}%)`} />}
-            {pctLow > 0 && <div style={{ width: `${pctLow}%` }} className="bg-slate-400 transition-all" title={`Low: ${summary.low} (${pctLow}%)`} />}
+        <div className="flex-1 max-w-md w-full">
+          <div className="h-2.5 w-full rounded-full bg-[#0B0F19] overflow-hidden flex border border-[#1F2E47]">
+            {totalActive === 0 ? (
+              <div className="w-full bg-[#16253B] text-center" title="No active alerts" />
+            ) : (
+              <>
+                {pctCrit > 0 && <div style={{ width: `${pctCrit}%` }} className="bg-rose-500 transition-all" title={`Critical: ${summary.critical} (${pctCrit}%)`} />}
+                {pctHigh > 0 && <div style={{ width: `${pctHigh}%` }} className="bg-amber-400 transition-all" title={`High: ${summary.high} (${pctHigh}%)`} />}
+                {pctMed > 0 && <div style={{ width: `${pctMed}%` }} className="bg-blue-500 transition-all" title={`Medium: ${summary.medium} (${pctMed}%)`} />}
+                {pctLow > 0 && <div style={{ width: `${pctLow}%` }} className="bg-slate-500 transition-all" title={`Low: ${summary.low} (${pctLow}%)`} />}
+              </>
+            )}
           </div>
         </div>
       </div>

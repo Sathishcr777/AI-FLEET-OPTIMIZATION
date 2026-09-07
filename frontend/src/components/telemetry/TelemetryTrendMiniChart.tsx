@@ -188,11 +188,13 @@ export const TelemetryTrendMiniChart: React.FC<TelemetryTrendMiniChartProps> = (
 
   // Statistical calculations on actual data
   const stats = useMemo(() => {
-    if (chartData.length === 0) return { current: 0, min: 0, max: 0, avg: 0, isThresholdBreached: false };
+    if (chartData.length === 0) return { current: 0, prev: 0, delta: 0, min: 0, max: 0, avg: 0, isThresholdBreached: false };
     const values = chartData.map((d) => d.value).filter((v) => !isNaN(v));
-    if (values.length === 0) return { current: 0, min: 0, max: 0, avg: 0, isThresholdBreached: false };
+    if (values.length === 0) return { current: 0, prev: 0, delta: 0, min: 0, max: 0, avg: 0, isThresholdBreached: false };
 
     const current = values[values.length - 1] ?? 0;
+    const prev = values.length >= 2 ? values[values.length - 2] ?? current : current;
+    const delta = current - prev;
     const min = Math.min(...values);
     const max = Math.max(...values);
     const sum = values.reduce((acc, v) => acc + v, 0);
@@ -204,7 +206,7 @@ export const TelemetryTrendMiniChart: React.FC<TelemetryTrendMiniChartProps> = (
       if (meta.thresholdOperator === "<" && current < meta.threshold) isThresholdBreached = true;
     }
 
-    return { current, min, max, avg, isThresholdBreached };
+    return { current, prev, delta, min, max, avg, isThresholdBreached };
   }, [chartData, meta]);
 
   return (
@@ -252,14 +254,21 @@ export const TelemetryTrendMiniChart: React.FC<TelemetryTrendMiniChartProps> = (
         <div className="grid grid-cols-4 gap-2.5 text-center text-xs">
           <div className="p-2.5 rounded-xl bg-[#0B0F19] border border-slate-800">
             <span className="text-[10px] uppercase font-bold text-slate-400 block font-mono">Current</span>
-            <span
-              className={clsx(
-                "text-sm font-bold font-mono",
-                stats.isThresholdBreached ? "text-rose-400" : "text-cyan-400"
+            <div className="flex items-center justify-center gap-1 mt-0.5">
+              <span
+                className={clsx(
+                  "text-sm font-bold font-mono",
+                  stats.isThresholdBreached ? "text-rose-400" : "text-cyan-400"
+                )}
+              >
+                {stats.current.toFixed(1)} {meta.unit}
+              </span>
+              {Math.abs(stats.delta) > 0.05 && (
+                <span className={clsx("text-[10px] font-mono font-semibold flex items-center", stats.delta > 0 ? "text-cyan-400" : "text-amber-400")}>
+                  {stats.delta > 0 ? "▲" : "▼"}
+                </span>
               )}
-            >
-              {stats.current.toFixed(1)} {meta.unit}
-            </span>
+            </div>
           </div>
 
           <div className="p-2.5 rounded-xl bg-[#0B0F19] border border-slate-800">

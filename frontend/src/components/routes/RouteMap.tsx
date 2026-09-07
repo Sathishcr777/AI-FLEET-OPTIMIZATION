@@ -72,7 +72,7 @@ export const RouteMap: React.FC<RouteMapProps> = ({
   return (
     <div
       className={clsx(
-        "relative w-full h-full rounded-2xl overflow-hidden border border-slate-200/90 bg-slate-50 shadow-card",
+        "relative w-full h-full rounded-2xl overflow-hidden border border-[#1F2E47] bg-[#0B0F19] shadow-card",
         className
       )}
     >
@@ -169,33 +169,33 @@ export const RouteMap: React.FC<RouteMapProps> = ({
       </MapContainer>
 
       {/* Map Legend Overlay */}
-      <div className="absolute top-3 right-3 z-[400] bg-white/90 backdrop-blur-md border border-slate-200/90 p-3 rounded-xl text-xs font-sans shadow-lg space-y-1.5 pointer-events-none">
+      <div className="absolute top-3 right-3 z-[400] bg-[#111C2D]/90 backdrop-blur-md border border-[#1F2E47] p-3 rounded-xl text-xs font-sans shadow-lg space-y-1.5 pointer-events-none">
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-emerald-600"></span>
-          <span className="text-slate-700 font-medium">Depot / Origin</span>
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-emerald-400"></span>
+          <span className="text-slate-200 font-medium">Depot / Origin</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-blue-600 border border-blue-700"></span>
-          <span className="text-slate-700 font-medium">Delivery Stop</span>
+          <span className="w-2.5 h-2.5 rounded-full bg-blue-500 border border-blue-400"></span>
+          <span className="text-slate-200 font-medium">Delivery Stop</span>
         </div>
         {destination && (
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-purple-600 border border-purple-700"></span>
-            <span className="text-slate-700 font-medium">Destination</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-purple-500 border border-purple-400"></span>
+            <span className="text-slate-200 font-medium">Destination</span>
           </div>
         )}
-        <div className="pt-1.5 border-t border-slate-200 flex items-center gap-2 text-[11px]">
+        <div className="pt-1.5 border-t border-[#1F2E47] flex items-center gap-2 text-[11px]">
           {hasOptimization ? (
             <>
-              <div className="w-4 h-0.5 bg-blue-600"></div>
-              <span className="text-blue-700 font-bold">2-Opt Path</span>
-              <div className="w-4 h-0.5 border-t border-dashed border-slate-400 ml-1"></div>
-              <span className="text-slate-500">Original</span>
+              <div className="w-4 h-0.5 bg-blue-500"></div>
+              <span className="text-cyan-400 font-bold">2-Opt Path</span>
+              <div className="w-4 h-0.5 border-t border-dashed border-slate-500 ml-1"></div>
+              <span className="text-slate-400">Original</span>
             </>
           ) : (
             <>
-              <div className="w-4 h-0.5 bg-amber-500"></div>
-              <span className="text-amber-700 font-bold">Configured Path</span>
+              <div className="w-4 h-0.5 bg-amber-400"></div>
+              <span className="text-amber-400 font-bold">Configured Path</span>
             </>
           )}
         </div>
