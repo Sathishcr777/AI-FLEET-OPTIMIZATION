@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": "./frontend",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["frontend/src"],
+  "exclude": [
+    "node_modules",
+    "frontend/node_modules",
+    "frontend/dist",
+    ".venv",
+    "scratch"
+  ]
+}

@@ -1,0 +1,89 @@
+version: '3.8'
+
+# =================================================================
+# FleetIQ – AI-Powered Fleet Intelligence & Optimization Platform
+# Foundation Docker Compose Orchestration (MVP Prototype)
+# =================================================================
+
+services:
+  # 1. TimescaleDB (PostgreSQL 16 with Time-Series Hypertable Engine)
+  db:
+    image: timescale/timescaledb:latest-pg16
+    container_name: fleetiq-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fleetiq_db}
+      POSTGRES_USER: ${POSTGRES_USER:-fleetiq_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fleetiq_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+      - ./backend/scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fleetiq_user} -d ${POSTGRES_DB:-fleetiq_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - fleetiq-network
+
+  # 2. MQTT Broker (Eclipse Mosquitto for Vehicle Telemetry Pub/Sub)
+  broker:
+    image: eclipse-mosquitto:2.0
+    container_name: fleetiq-broker
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./backend/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -h localhost -p 1883 -t '$$SYS/broker/version' -C 1 -W 2 || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - fleetiq-network
+
+  # 3. Backend (FastAPI API Server, Ingestion Pipeline & ML Inference)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fleetiq-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      PROJECT_NAME: "FleetIQ - AI Fleet Intelligence"
+      ENVIRONMENT: "development"
+      DEBUG: "True"
+      DATABASE_URL: "postgresql+asyncpg://${POSTGRES_USER:-fleetiq_user}:${POSTGRES_PASSWORD:-fleetiq_password}@db:5432/${POSTGRES_DB:-fleetiq_db}"
+      SYNC_DATABASE_URL: "postgresql://${POSTGRES_USER:-fleetiq_user}:${POSTGRES_PASSWORD:-fleetiq_password}@db:5432/${POSTGRES_DB:-fleetiq_db}"
+      MQTT_BROKER_HOST: "broker"
+      MQTT_BROKER_PORT: "1883"
+      MQTT_WS_PORT: "9001"
+    depends_on:
+      db:
+        condition: service_healthy
+      broker:
+        condition: service_started
+    networks:
+      - fleetiq-network
+
+volumes:
+  timescaledb_data:
+    driver: local
+  mosquitto_data:
+    driver: local
+  mosquitto_log:
+    driver: local
+
+networks:
+  fleetiq-network:
+    driver: bridge

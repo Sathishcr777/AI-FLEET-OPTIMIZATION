@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fleetiq"
+version = "1.0.0"
+description = "FleetIQ - AI-Powered Fleet Intelligence & Optimization Platform"
+authors = [{ name = "FleetIQ Team" }]
+requires-python = ">=3.11"
+readme = "PROJECT_PLAN.md"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::starlette.exceptions.StarletteDeprecationWarning",
+]
